@@ -1,0 +1,227 @@
+header{
+  margin-top: 20px;
+  margin-left: 190px;
+  width: 70%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 20px;
+  left: 0;
+  z-index: 1000;
+
+
+
+}
+header a{
+  color: #333;
+  margin-right: 40px;
+  text-decoration: none;
+}
+
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav {
+  border-radius: 20px;
+  border: 1px solid rgb(48, 101, 62);
+  box-shadow: 0 5px 4px rgba(0, 0, 0, 0.5);
+  background-color: white;
+  position: static;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  display: flex; 
+  justify-content: space-between; 
+}
+
+nav .logo {
+  margin: 0 20px;
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: 700;
+  color: rgb(48, 101, 62);
+}
+
+.menu {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  height: 70px;
+}
+
+.menu li {
+  display: inline-block;
+  width: 90px;
+  transition: all 0.3s ease-in-out;
+}
+
+.menu li:hover .submenu {
+  height: 85px;
+  cursor: pointer;
+}
+
+.menu > li:hover > a {
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+.menu > li:hover > a::before {
+  visibility: visible;
+  scale: 1 1;
+}
+
+.submenu {
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  background-color: #1f4d4f;
+  height: 0;
+  line-height: 40px;
+  box-sizing: border-box;
+  transition: height 0.3s ease-in-out;
+}
+.menu li .submenu a {
+  color: #fff;
+  opacity: 0;
+  font-size: 16px;
+  transition: opacity 0.25s;
+}
+
+.menu > li:hover .submenu a {
+  opacity: 1;
+}
+
+.menu > li .submenu a:hover,
+.menu > li .submenu a.active {
+  background: rgb(0 0 0 / 20%);
+}
+
+.menu > li a {
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  text-decoration: none;
+  position: relative;
+  height: 100%;
+}
+
+
+.menu > li > a::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  bottom: 20px;
+  left: 0px;
+  background-color: rgb(255, 165, 0);
+  transition: all 0.2s ease-in-out;
+  scale: 0 0;
+  visibility: hidden;
+}
+
+.bottom-banner {
+ background-image: url(pexels-arcadiantastic-32421445.jpg);
+ height: 300px;
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ flex-direction: row;
+ align-items: center;
+ text-align: center;
+ background-size: cover;
+ background-position: center;
+ margin-top: 20px;
+}
+
+.login, .notfication-logo {
+  border: 1px solid rgb(48, 101, 62);
+  box-shadow: 0 5px 4px rgba(0, 0, 0, 0.5);
+  background-color: white;
+  border-radius: 50%;
+  margin-left: 50px;
+  text-align: center;
+  cursor: pointer;
+  padding: 12px 12px;
+}
+ 
+.login i, .notfication-logo i {
+  font-size: 25px;
+}
+
+.login {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.login-dropdown {
+  display:none;
+  flex-direction: column;
+  position:fixed;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid rgb(48, 101, 62);
+  min-width: 200px;
+  box-shadow: 5px 5px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  animation: slideDown 0.3s ease forwards;
+   padding: 5px 5px;
+}
+
+.login-dropdown a {
+  text-decoration: none;
+  color: black;
+  display: block;
+  margin-left: 35px;
+  line-height: 25px;
+ 
+}
+
+.login-dropdown a:hover {
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (width < 720px) {
+ header{
+  width: 90%;
+  margin-left: 30px;
+ }
+
+ nav .logo {
+  font-size: 15px;
+  margin: 0 10px;
+ }
+
+
+
+ .menu li {
+  display: none;
+ }
+}
+
