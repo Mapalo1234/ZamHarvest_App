@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="css/orderTable.css">
+   <link rel="stylesheet" href="all/css/font-awesome.min.css">
+     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/loader.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+  <title>Order Management</title>
+</head>
+<body>
+
+  <header id="navbar">
+    <nav>
+      <a class="logo" href="index.html">ZamHarvest</a>
+      <ul class="menu">
+        <li><a href="/home">Home</a></li>
+        <li><a href="/view">Seller</a></li>
+        <li><a href="/orderTable">Orders</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </nav>
+    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
+     <div class="notfication-logo"><i class="fa fa-bell" aria-hidden="true"></i></div>
+  </header>
+
+<div class="container">
+
+  <table>
+    <thead>
+      <tr class="heading">
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Total Price</th>
+        <th>Quantity</th>
+        <th>Unit</th>
+        <th>Seller</th>
+        <th>Paid Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody class="orderInfo"></tbody>
+  </table>
+
+  <footer>
+    <span class="showEntries"></span>
+    <div class="pagination"></div>
+  </footer>
+</div>
+
+
+<!-- Popup Form -->
+<div class="dark_bg">
+  <div class="popup">
+    <header>
+      <h2 class="modalTitle">Fill the Form</h2>
+      <button class="closeBtn">&times;</button>
+    </header>
+    <div class="body">
+      <form id="orderForm">
+        <div class="imgholder">
+          <img src="./img/pic1.png" alt="Order Image" width="150" height="150" class="img">
+        </div>
+        <div class="inputFieldContainer">
+          <div class="form_control">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+          </div>
+          <div class="form_control">
+            <label for="totalPrice">Total Price:</label>
+            <input type="number" id="totalPrice" required>
+          </div>
+          <div class="form_control">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" required>
+          </div>
+          <div class="form_control">
+            <label for="seller">Seller:</label>
+            <input type="text" id="seller" required>
+          </div>
+          <div class="form_control">
+            <label for="paidStatus">Paid Status:</label>
+            <select id="paidStatus" required>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <footer class="popupFooter">
+      <button form="orderForm" class="submitBtn">Submit</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2>Complete Your Payment</h2>
+    <form id="paymentForm">
+      <input type="hidden" id="orderId" name="orderId">
+      
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" name="phone" required placeholder="Enter phone number">
+
+      <label for="amount">Amount:</label>
+      <input type="text" id="amount" name="amount" readonly>
+      <button type="submit">Pay Now</button>
+        <div class="payimg">
+        <img src="/frontend/public/image/Bharti Airtel's Web Revenue Jumps 466% in Q1; Must you Put money into the 5G-Prepared Telecom___.jpg" alt="">
+        </div>
+    </form>
+    <span class="loader"></span>
+  </div>
+</div>
+
+
+<script src="js/orderTable.js"></script>
+</body>
+</html>

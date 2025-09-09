@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZamHarvest</title>
+  <link rel="stylesheet" href="css/listproduct.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/progress.css">
+  <link rel="stylesheet" href="all/css/font-awesome.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/search.css">
+   <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+  <header id="navbar">
+    <nav>
+      <a class="logo" href="/home">ZamHarvest</a>
+      <ul class="menu">
+        <li><a href="/home" class="active">Home</a></li>
+        <li><a href="/view">Seller</a></li>
+        <li><a href="/orderTable">Orders</a></li>
+      </ul>
+    </nav>
+    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
+     <div class="notfication-logo"><i class="fa fa-bell" aria-hidden="true"></i></div>
+  </header>
+
+  <!-- Banner -->
+  <section class="top-banner">
+    <h2>Access to a Vast <span> Supplier</span> Network</h2>
+    <p>Get instant access to thousands of produce listings of all grades all in one place.</p>
+  </section>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <form action="#" class="search" id="search-bar">
+      <input type="search" placeholder="Search Item..." name="q" class="search__input">
+      <div class="search__button" id="search-button">
+        <i class="ri-search-2-line search__icon"></i>
+        <i class="ri-close-line search__close"></i>
+      </div>
+    </form>
+  </div>
+  <!-- Product Section -->
+  <div class="section-p1" id="product1">
+    <h2>NEW PRODUCTS</h2>
+    
+    <div class="pro-container" id="productList">
+      <!-- Products will be injected here -->
+    </div>
+  </div>
+  <span class="loader"></span>
+  <script src="assets/js/main.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/listproduct.js"></script>
+  <script src="js/progress.js" defer></script>
+</body>
+</html>

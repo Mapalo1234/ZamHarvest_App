@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Product</title>
+  <link rel="stylesheet" href="/css/add.css" />
+  <link rel="stylesheet" href="/css/inventory.css" />
+  <link rel="stylesheet" href="all/css/font-awesome.min.css" />
+   <link rel="stylesheet" href="css/loader.css">
+   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+ <div class="back-link"><a href="/view">Back to Product List</a></div>
+ <h2 id="formTitle">Add a Product</h2>
+
+  <form id="productForm" >
+    <!-- Step 1 -->
+    <div class="form-step active">
+      <input type="text" id="name" placeholder="Product Name" required />
+      <input type="number" id="price" placeholder="Price" required />
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="fruit">Fruit</option>
+        <option value="vegetable">Vegetable</option>
+      </select>
+      <button type="button" class="next-btn">Next</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="form-step">
+      <select id="province" required>
+        <option value="">Select Province</option>
+      </select>
+      <select id="location" required>
+        <option value="">Select Town</option>
+      </select>
+      <select id="organicStatus">
+        <option value="">Select Organic Status</option>
+        <option value="Organic">Organic</option>
+        <option value="Non-Organic">Non-Organic</option>
+        <option value="Certified Organic">Certified Organic</option>
+      </select>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="form-step">
+      <div id="drop-area">
+        <input type="file" id="inputFile" hidden />
+        <div id="image-view"><i class="fa fa-upload"></i><p>Upload Image</p></div>
+      </div>
+      <textarea id="description" placeholder="Enter product description..." required></textarea>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 4 - Inventory -->
+    <div class="form-step">
+      <h3>Inventory Information</h3>
+      <input type="number" id="stock" placeholder="Stock Quantity" min="0" required />
+      <select id="unit" required>
+        <option value="">Select Unit</option>
+        <option value="kg">Kilograms (kg)</option>
+        <option value="lbs">Pounds (lbs)</option>
+        <option value="pieces">Pieces</option>
+        <option value="bags">Bags</option>
+        <option value="boxes">Boxes</option>
+        <option value="crates">Crates</option>
+      </select>
+      <input type="date" id="harvestDate" placeholder="Harvest Date" />
+      <input type="date" id="expiryDate" placeholder="Expiry Date" />
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="submit" id="submitButton">Submit</button>
+      </div>
+    </div>
+  </form>
+ <div class="loader-container" id="loader" style="display: none;">
+  <span class="loader"></span>
+</div>
+  <script src="/js/add.js"></script>
+  <script src="js/previewimage.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>

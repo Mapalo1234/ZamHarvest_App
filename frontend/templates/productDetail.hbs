@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/test.css">
+    <link rel="stylesheet" href="all/css/font-awesome.min.css">
+    <title>Product Details</title>
+</head>
+<body>
+    <div class="back-link"><i class="fa fa-chevron-left" aria-hidden="true"></i><a href="/listproduct">Back to Market Place</a></div>
+    
+    <div id="temporaryContent" class="temporaryContent">
+        <div class="left-detail">
+            <div class="name-product">
+                <div class="title"></div>
+                <div class="type-Product"></div>
+            </div>
+            <div class="image-container">
+                <img src="" alt="">
+            </div>
+        </div>
+        
+        <div class="right-detail">
+            <div class="content">
+                <div class="price-container">
+                    <div class="price-lable"></div>
+                    <span class="slash">/</span>
+                    <div class="scale">ld</div>
+                </div>
+                <label class="date-lable" for="date">Delivery Date</label>
+                <div class="delivery-date"><input type="date" placeholder="Delivery"></div>
+                <div class="price"></div>
+                
+                <label class="quantity" for="date">Add Quantity</label>
+                <div class="counter">
+                    <span class="minus">-</span>
+                    <span class="num">01</span>
+                    <span class="plus">+</span>
+                </div>
+                
+                <div class="buttons">
+                    <button class="order" type="button" data-product-id="{{product._id}}">ORDER</button>
+                    <button class="addCart">Add To Cart</button>
+                </div>
+                
+                <button class="btn-negotiate">Negotiate with Supplier <i class="fa fa-comments-o" aria-hidden="true"></i></button>
+            </div>
+            <p class="final-price">Total: K<span id="finalPrice">00</span></p>
+        </div>
+    </div>
+
+    <div class="description"></div>
+    <span class="loader"></span>
+
+    <script src="js/counter.js"></script>
+    <script src="/js/test.js"></script>
+
+</body>
+</html>
