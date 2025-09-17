@@ -18,12 +18,21 @@
       <a class="logo" href="/home">ZamHarvest</a>
       <ul class="menu">
         <li><a href="/home" class="active">Home</a></li>
-        <li><a href="/view">Seller</a></li>
+        <li><a href="/view">Sale</a></li>
         <li><a href="/orderTable">Orders</a></li>
       </ul>
     </nav>
-    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
-     <div class="notfication-logo"><i class="fa fa-bell" aria-hidden="true"></i></div>
+              <div class="login">
+             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
+               <div class="login-dropdown" id="loginDropdown">
+                <a href="/login">Login</a>
+                <a href="account.html">Manage Account</a>
+             </div>
+          </div>
+     <div class="notfication-logo">
+        <i class="fa fa-bell" aria-hidden="true"></i>
+      <span class="badge">3</span>
+</div>
   </header>
 
   <!-- Banner -->
@@ -42,6 +51,13 @@
       </div>
     </form>
   </div>
+      <div class="tab_box">
+        <button class="tab_btn active" id="tab1" data-tab="tab1">All</button>
+        <button class="tab_btn" id="fruits">Fruits</button>
+        <button class="tab_btn" id="vegetables">Vegetables</button>
+        <button class="tab_btn" id="meat">Meat</button>
+        <div class="line"></div>
+    </div>
   <!-- Product Section -->
   <div class="section-p1" id="product1">
     <h2>NEW PRODUCTS</h2>
@@ -50,10 +66,22 @@
       <!-- Products will be injected here -->
     </div>
   </div>
-  <span class="loader"></span>
+      <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
+    <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
+  <script src="js/filter.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="/js/loginscript.js"></script>
   <script src="js/search.js"></script>
   <script src="js/listproduct.js"></script>
-  <script src="js/progress.js" defer></script>
+  <script src="js/progress.js"></script>
 </body>
 </html>

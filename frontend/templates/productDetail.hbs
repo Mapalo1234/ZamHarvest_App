@@ -16,6 +16,7 @@
                 <div class="title"></div>
                 <div class="type-Product"></div>
             </div>
+            <div class="availability" id="availabilityID"></div>
             <div class="image-container">
                 <img src="" alt="">
             </div>
@@ -29,7 +30,7 @@
                     <div class="scale">ld</div>
                 </div>
                 <label class="date-lable" for="date">Delivery Date</label>
-                <div class="delivery-date"><input type="date" placeholder="Delivery"></div>
+                <div class="delivery-date"><input type="date" placeholder="Delivery" id="deliveryDate" min=""></div>
                 <div class="price"></div>
                 
                 <label class="quantity" for="date">Add Quantity</label>
@@ -46,15 +47,24 @@
                 
                 <button class="btn-negotiate">Negotiate with Supplier <i class="fa fa-comments-o" aria-hidden="true"></i></button>
             </div>
-            <p class="final-price">Total: K<span id="finalPrice">00</span></p>
+            <p class="final-price">Total Price: K<span id="finalPrice">00</span></p>
         </div>
     </div>
-
+    <div class="aboutProduct">About Product:</div>
     <div class="description"></div>
-    <span class="loader"></span>
+    <div class="loader-wrapper">
+        <span class="loader"></span>
+    </div>
 
     <script src="js/counter.js"></script>
     <script src="/js/test.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const loaderWrapper = document.querySelector(".loader-wrapper");
+        if (loaderWrapper) {
+          loaderWrapper.style.display = "none"; // Hide loader
+        }
+      });
 
 </body>
 </html>

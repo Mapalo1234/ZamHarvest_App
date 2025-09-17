@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   //  Get sellerId from localStorage
   const seller = JSON.parse(localStorage.getItem('user'));
   const sellerId = seller ? seller.id : null;
-
+  console.log("Seller ID:", sellerId);
   if (!sellerId) {
     document.querySelector('.orderInfo').innerHTML =
       '<tr><td colspan="8">Seller not logged in.</td></tr>';

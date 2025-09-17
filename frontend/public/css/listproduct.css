@@ -66,7 +66,7 @@ body {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 50px;
+  gap: 70px;
   padding-top: 20px;
 }
 
@@ -101,6 +101,7 @@ body {
 }
 
 #product1 .pro .des {
+  margin-top: 8px;
   text-align: start;
   font-size: 14px;
 }
@@ -137,6 +138,35 @@ body {
   text-align: center;
 }
 
+#product1 .pro .available {
+  border-radius: 5px;
+  padding: 5px;
+  color: #ffffff;
+  background-color: #068719;
+  margin-bottom: 4px;
+  width: 70px;
+}
+
+#product1 .pro .unavailable {
+    border-radius: 5px;
+  padding: 5px;
+  color: #ffffff;
+  font-weight: bold;
+  background-color: #e30c05;
+  margin-bottom: 4px;
+  width: 90px;
+}
+
+
+#product1 .pro .available {
+  border-radius: 5px;
+  padding: 5px;
+  color: #ffffff;
+  background-color: #068719;
+  margin-bottom: 4px;
+  width: 70px;
+}
+
 /* Pagination */
 .pagination {
   display: flex;
@@ -165,6 +195,58 @@ body {
   color: white;
   border-color: #068719;
 }
+
+/* tab box */
+
+.tab_box {
+  width: 100%;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  font-size: 18px;
+  position: relative;
+  gap: 150px; /* adjust the value for desired spacing */
+}
+.tab_box .tab_btn{
+  font-size: 18px;
+  font-weight: 600;
+  color: #919191;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 18px;
+
+}
+
+.tab_box .tab_btn.active{
+  color:rgb(106, 104, 150);
+}
+.content_box{
+  padding: 20px;
+}
+/* #temporaryContent{
+  display: none;
+} */
+ .content_box .content.active{
+  display: block;
+  animation: moving .5s ease;
+}
+@keyframes moving{
+  from{transform: translateX(50px); opacity: 0;}
+  to{transform: translateX(0px); opacity: 1;}
+}
+
+.line{
+  position: absolute;
+  top: 62px;
+  left: 17px;
+  width: 90px;
+  height: 2px;
+  background-color: rgb(106, 104, 150);
+  border-radius: 10px;
+  transition: all .3s ease-in-out ;
+}
+
 
 /* Responsive Layout */
 @media (max-width: 992px) {

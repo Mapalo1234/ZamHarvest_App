@@ -225,3 +225,14 @@ nav .logo {
  }
 }
 
+.notfication-logo .badge {
+  position: absolute;
+  top: 10px;
+  right: -8px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 50%;
+}
+

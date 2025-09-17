@@ -23,6 +23,7 @@
         <option value="">Select Category</option>
         <option value="fruit">Fruit</option>
         <option value="vegetable">Vegetable</option>
+        <option value="Meat">Meat</option>
       </select>
       <button type="button" class="next-btn">Next</button>
     </div>
@@ -60,10 +61,14 @@
       </div>
     </div>
 
-    <!-- Step 4 - Inventory -->
+    <!-- Step 4 --->
     <div class="form-step">
       <h3>Inventory Information</h3>
-      <input type="number" id="stock" placeholder="Stock Quantity" min="0" required />
+      <label for="availability">Availability:</label>
+      <select name="availability" id="availability" required>
+        <option value="Available">Available</option>
+        <option value="Unavailable">Unavailable</option>
+      </select>
       <select id="unit" required>
         <option value="">Select Unit</option>
         <option value="kg">Kilograms (kg)</option>

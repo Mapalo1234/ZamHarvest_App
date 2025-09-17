@@ -50,6 +50,14 @@ body {
     height: auto;
 }
 
+table td img {
+    border-radius: 5px;
+}
+
+#paymentModal img {
+    margin-left: 50px;
+}
+
 /* Header Section */
 .container header .filterEntries {
     display: flex;

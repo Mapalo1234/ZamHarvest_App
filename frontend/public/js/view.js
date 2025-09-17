@@ -12,7 +12,8 @@ async function loadProducts(searchTerm = "", page = 1) {
   try {
     const response = await fetch('/products');
     const products = await response.json();
-     localStorage.setItem("products", JSON.stringify(products));
+    //  localStorage.setItem("products", JSON.stringify(products));
+
 
     const term = searchTerm.toLowerCase();
     allProducts = products.filter(product => {

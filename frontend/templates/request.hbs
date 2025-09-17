@@ -70,9 +70,19 @@
   </footer>
 </div>
    <div class="loader-container" id="loader" style="display: none;">
-  <span class="loader"></span>
+        <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
 
 {{!-- <script src="js/orderTable.js"></script> --}}
 <script src="js/requestDashboard.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
 </body>
 </html>

@@ -27,16 +27,23 @@ async function fetchOrders() {
         return;
     }
 
-    try {
-        const res = await fetch(`/orders/${BuyerId}`);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+ try {
+  const res = await fetch(`/orders/${BuyerId}`);
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-        const data = await res.json();
-        if (!data.orders || !Array.isArray(data.orders)) {
-            console.error("No orders found in response");
-            return;
-        }
+  const data = await res.json();
 
+  if (!data.orders || !Array.isArray(data.orders) || data.orders.length === 0) {
+    productList.innerHTML = `
+      <div style="text-align:center; padding:40px; color:#555;">
+        <img src="/image/icons8-empty-box-100.png" 
+             alt="No results" 
+             style="width:100px; height:100px; opacity:0.7; margin-bottom:15px;">
+        <p>No matching products found.</p>
+      </div>
+    `;
+    return;
+  }
         getData = data.orders.map(order => ({
             id: order._id,
             picture: order.productImage || "default.png",
@@ -44,10 +51,10 @@ async function fetchOrders() {
             totalPrice: order.totalPrice,
             quantity: order.quantity || 1,
             sellerName: order.sellerName || "Unknown Seller",
-            paidStatus: order.paidStatus
+            paidStatus: order.paidStatus,
+            unit: order.unit
         }));
 
-        console.log("Fetched Orders:", getData);
 
         preLoadCalculations();
         displayIndexBtn();

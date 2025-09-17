@@ -6,10 +6,15 @@
   let buyerId = '';
   let seller_Id = '';
   let unit = '';
-  
+  let availability = 'Available';
+  let quantity = 1;
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const productId = localStorage.getItem('selectedProductId');
-
+   
+  const today = new Date().toISOString().split("T")[0];
+  document.querySelector('input[type="date"]').setAttribute("min", today);
 
   if (!productId) {
     document.querySelector('#temporaryContent').innerHTML = "<p>No product selected.</p>";
@@ -23,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("product data",product)
       if (product) {
   unitPrice = product.price;
-        
+  availability = product.availability || 'Available';    
   productName = product.name;
   productImage = product.image;
   productSeller = product.sellerId?.username || 'Unknown';
@@ -34,21 +39,18 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('.image-container img').src = product.image;
         document.querySelector('.scale').textContent = `${product.unit || "N/A"}`;
         document.querySelector('.price-lable').textContent = `K${product.price}`;
-
         const descEl = document.querySelector('.description');
         const locationParts = product.location ? product.location.split(',') : ["", ""];
         const province = locationParts[0]?.trim() || "N/A";
-        const town = locationParts[1]?.trim() || "N/A";
 
         descEl.innerHTML = `
           <p><span>Category:</span> ${product.category || "N/A"}</p>
-          <p class="organic">Organic: ${product.organicStatus || 'N/A'}</p>
-          <p><span>Province:</span> ${province}</p>
-          <p><span>Town:</span> ${town}</p>
+          <p class="organic"><i class="fa fa-pagelines" aria-hidden="true"></i>: ${product.organicStatus || 'N/A'}</p>
           <p><span>Unit:</span> ${product.unit || 'N/A'}</p>
-          <p class="location">Town: ${product.location || 'N/A'}</p>
+          <p class="location"><i class="fa fa-map-marker" aria-hidden="true"></i>: ${product.location || 'N/A'}, ${province}</p>
           <p><span>Description:</span> ${product.description || "No description available"}</p>
-          <p class="seller">Seller: ${product.sellerId?.username || 'Unknown'}</p>
+          <p class="seller"><i class="fa fa-user" aria-hidden="true"></i>: ${product.sellerId?.username || 'Unknown'}</p>
+          <p class="availability">Product: ${product.availability|| 'Available'}</p>
         `;
 
         updateFinalPrice(); // Set initial final price
@@ -113,10 +115,11 @@ document.querySelector(".order").addEventListener("click", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         productId,
-        quantity,
+        availability,
         deliveryDate,
         totalPrice,
         productName,
+        quantity,
         unit,
         productImage,
         sellerName: productSeller,
@@ -125,6 +128,7 @@ document.querySelector(".order").addEventListener("click", async (e) => {
         sellerId: seller_Id
       })
     });
+
 
     const data = await response.json();
 

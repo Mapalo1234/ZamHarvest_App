@@ -10,8 +10,9 @@
       border-radius: 20px;
       padding: 20px;
       display: flex;
+      justify-content: center;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 70px;
       margin: 20px;
     }
 
@@ -141,7 +142,7 @@
     }
 
     .pagination-controls button {
-      background-color: rgb(99, 182, 99);
+      background-color: rgb(201, 201, 201);
       color: white;
       border: none;
       border-radius: 5px;

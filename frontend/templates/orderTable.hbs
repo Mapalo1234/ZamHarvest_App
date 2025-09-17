@@ -17,10 +17,9 @@
       <a class="logo" href="index.html">ZamHarvest</a>
       <ul class="menu">
         <li><a href="/home">Home</a></li>
-        <li><a href="/view">Seller</a></li>
+        <li><a href="/view">Sale</a></li>
+        <li><a href="/listproduct">Buy</a></li>
         <li><a href="/orderTable">Orders</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Blog</a></li>
       </ul>
     </nav>
     <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
@@ -99,7 +98,8 @@
 <div id="paymentModal" class="modal">
   <div class="modal-content">
     <span id="closeModal" class="close">&times;</span>
-    <h2>Complete Your Payment</h2>
+    <h2>Complete Mobile Payment</h2>
+    <img src="/image/pay.png" alt=""></img>
     <form id="paymentForm">
       <input type="hidden" id="orderId" name="orderId">
       
@@ -109,15 +109,21 @@
       <label for="amount">Amount:</label>
       <input type="text" id="amount" name="amount" readonly>
       <button type="submit">Pay Now</button>
-        <div class="payimg">
-        <img src="/frontend/public/image/Bharti Airtel's Web Revenue Jumps 466% in Q1; Must you Put money into the 5G-Prepared Telecom___.jpg" alt="">
-        </div>
     </form>
-    <span class="loader"></span>
   </div>
 </div>
+        <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
 
-
+  <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
 <script src="js/orderTable.js"></script>
 </body>
 </html>

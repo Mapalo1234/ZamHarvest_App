@@ -155,10 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Trigger town list population
       provinceSelect.dispatchEvent(new Event("change"));
       locationSelect.value = product.location || "";
-
+      document.getElementById("availability").value = product.availability || "Available";
       document.getElementById("organicStatus").value = product.organicStatus || "Non-Organic";
       document.getElementById("description").value = product.description || "";
-      document.getElementById("stock").value = product.stock || "";
       document.getElementById("unit").value = product.unit || "kg";
       document.getElementById("harvestDate").value = product.harvestDate || "";
       document.getElementById("expiryDate").value = product.expiryDate || "";
@@ -185,11 +184,11 @@ document.addEventListener("DOMContentLoaded", () => {
       price: Number(document.getElementById("price").value.trim()),
       category: document.getElementById("category").value,
       province: provinceSelect.value,
+      availability: document.getElementById("availability").value || "Available",
       location: locationSelect.value,
       organicStatus: document.getElementById("organicStatus").value || "Non-Organic",
       description: document.getElementById("description").value.trim(),
       image: uploadedImage,
-      stock: Number(document.getElementById("stock").value) || 0,
       unit: document.getElementById("unit").value || "kg",
       harvestDate: document.getElementById("harvestDate").value || null,
       expiryDate: document.getElementById("expiryDate").value || null
