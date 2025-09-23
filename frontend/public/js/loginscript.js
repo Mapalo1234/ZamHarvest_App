@@ -36,6 +36,11 @@ function registerFunction() {
 
 if (loginIcon && loginDropdown) {
   loginIcon.addEventListener("click", () => {
+    // Update dropdown content before showing (if auth manager exists)
+    if (window.authManager) {
+      window.authManager.updateLoginDropdown();
+    }
+    
     loginDropdown.style.display =
       loginDropdown.style.display === "flex" ? "none" : "flex";
   });

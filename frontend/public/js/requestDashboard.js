@@ -1,16 +1,36 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  //  Get sellerId from localStorage
-  const seller = JSON.parse(localStorage.getItem('user'));
-  const sellerId = seller ? seller.id : null;
-  console.log("Seller ID:", sellerId);
-  if (!sellerId) {
-    document.querySelector('.orderInfo').innerHTML =
-      '<tr><td colspan="8">Seller not logged in.</td></tr>';
-    return;
-  }
+  console.log("Request dashboard loaded");
+  
+  // Show loading state
+  document.querySelector('.orderInfo').innerHTML =
+    '<tr><td colspan="8">Loading requests...</td></tr>';
 
   try {
-    const res = await fetch(`/requests/seller/${sellerId}`);
+    // Use the new route that doesn't require sellerId in URL
+    const res = await fetch('/requests/seller/test', {
+      method: 'GET',
+      credentials: 'same-origin', // Include cookies for session
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    console.log("Response status:", res.status);
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("API Error:", errorData);
+      
+      if (res.status === 403) {
+        document.querySelector('.orderInfo').innerHTML =
+          '<tr><td colspan="8">Please log in as a seller to view requests.</td></tr>';
+      } else {
+        document.querySelector('.orderInfo').innerHTML =
+          '<tr><td colspan="8">Error: ' + (errorData.error || 'Failed to load requests') + '</td></tr>';
+      }
+      return;
+    }
+    
     const data = await res.json();
     console.log("Fetched Requests:", data);
 
@@ -42,8 +62,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector('.orderInfo').innerHTML = rows;
 
   } catch (err) {
+    console.error("Network error:", err);
     document.querySelector('.orderInfo').innerHTML =
-      '<tr><td colspan="8">Error loading requests.</td></tr>';
-    console.error(err);
+      '<tr><td colspan="8">Network error. Please check your connection and try again.</td></tr>';
   }
 });

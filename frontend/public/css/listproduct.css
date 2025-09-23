@@ -12,12 +12,12 @@ body {
 }
 
 /* Top Banner */
-.top-banner {
+.top-banner2 {
   margin-top: -95px;
   background-image: linear-gradient(
     rgba(0, 0, 0, 0.5),
     rgba(0, 0, 0, 0.5)
-  ), url(/image/pexels-arcadiantastic-32421445.jpg);
+  ), url(/image/pexels-enginakyurt-1435904.jpg);
   height: 300px;
   width: 100%;
   display: flex;
@@ -29,18 +29,18 @@ body {
   background-position: center;
 }
 
-.top-banner h2 {
+.top-banner2 h2 {
   font-size: 50px;
   color: white;
   font-weight: 900;
 }
 
-.top-banner h2 span {
-  color: rgb(16, 78, 32);
+.top-banner2 h2 span {
+  color: rgb(7, 189, 0);
   font-weight: 900;
 }
 
-.top-banner p {
+.top-banner2 p {
   color: white;
   font-size: 20px;
 }
@@ -76,6 +76,7 @@ body {
   border: 1px solid #cce7d0;
   border-radius: 25px;
   cursor: pointer;
+
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
   margin: 15px 0;
   transition: 0.2s ease;
@@ -112,7 +113,8 @@ body {
 }
 
 #product1 .pro .des h5 {
-  font-size: 17px;
+  font-family:poppins, sans-serif;
+  font-size: 20px;
   padding-top: 7px;
   color: #1a1a1a;
 }

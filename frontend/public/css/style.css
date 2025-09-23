@@ -20,7 +20,7 @@ a{
     position: relative;
 }
 .carousel .list .item{
-    width: 100%;
+    width: 99%;
     height: 100%;
     position: absolute;
     inset: 0 0 0 0;
@@ -44,14 +44,17 @@ a{
 }
 
 
-.carousel .list .item .title,
-.carousel .list .item .topic{
-    margin-bottom: 20px;
+.carousel .list .item .title {
+    margin-top: 40px;
     font-size: 5em;
     font-weight: bold;
     line-height: 1.3em;
 }
 .carousel .list .item .topic{
+     font-size: 5em;
+    font-weight: bold;
+    line-height: 1.3em;
+    margin-top: 20;
     color: rgb(48, 101, 62);
 }
 .carousel .list .item .buttons{
@@ -112,6 +115,7 @@ a{
     font-weight: 500;
 }
 .thumbnail .item .content .description{
+    text-wrap: wrap;
     font-weight: 300;
 }
 /* arrows */
@@ -125,12 +129,14 @@ a{
     display: flex;
     gap: 10px;
     align-items: center;
+    justify-content: center;
 }
 .arrows button{
     width: 40px;
     height: 40px;
+
     border-radius: 50%;
-    background-color: #eee4;
+    background-color: rgba(221, 219, 219, 0.527);
     border: none;
     color: #fff;
     font-family: monospace;

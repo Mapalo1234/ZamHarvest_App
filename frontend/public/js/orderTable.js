@@ -66,6 +66,20 @@ async function fetchOrders() {
 
 fetchOrders();
 
+// Add refresh functionality
+function refreshOrders() {
+    console.log("Refreshing orders...");
+    fetchOrders();
+}
+
+// Add refresh button event listener
+document.addEventListener('DOMContentLoaded', () => {
+    const refreshBtn = document.getElementById('refreshOrdersBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshOrders);
+    }
+});
+
 // ------------------ Pagination ------------------ //
 function preLoadCalculations() {
     arrayLength = getData.length;
@@ -223,8 +237,17 @@ document.getElementById("paymentForm").addEventListener("submit", async (e) => {
 
     const amount = amountInput.value;
     const phone = phoneInput.value;
-    const reference = "REF" + Date.now();
     const orderId = orderIdInput.value;
+    
+    // Find the order to get the correct orderId (orderId field from database)
+    const order = getData.find(o => o.id === orderId);
+    if (!order) {
+        alert("Order not found!");
+        return;
+    }
+    
+    // Use the order's ID as reference for the payment
+    const reference = orderId;
 
     try {
         const response = await fetch("/pay", {
@@ -235,8 +258,11 @@ document.getElementById("paymentForm").addEventListener("submit", async (e) => {
 
         const result = await response.json();
         if (response.ok) {
-            alert("Payment successful!");
+            alert("Payment initiated! You will be notified when payment is confirmed.");
             modal.style.display = "none";
+            
+            // Start polling for payment status updates
+            startPaymentStatusPolling(orderId);
         } else {
             alert("Payment failed: " + result.error);
         }
@@ -245,3 +271,40 @@ document.getElementById("paymentForm").addEventListener("submit", async (e) => {
         alert("Error processing payment.");
     }
 });
+
+// Function to poll for payment status updates
+function startPaymentStatusPolling(orderId) {
+    const pollInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`/check-payment/${orderId}`);
+            if (response.ok) {
+                const orderData = await response.json();
+                
+                // Update the order in the local data
+                const orderIndex = getData.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    getData[orderIndex].paidStatus = orderData.paidStatus;
+                    
+                    // Refresh the display
+                    highlightIndexBtn();
+                    
+                    // Stop polling if payment is completed or failed
+                    if (orderData.paidStatus === "Paid" || orderData.paidStatus === "Failed") {
+                        clearInterval(pollInterval);
+                        
+                        if (orderData.paidStatus === "Paid") {
+                            alert("Payment confirmed! Order status updated.");
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error checking payment status:", error);
+        }
+    }, 5000); // Check every 5 seconds
+    
+    // Stop polling after 5 minutes
+    setTimeout(() => {
+        clearInterval(pollInterval);
+    }, 300000);
+}

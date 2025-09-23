@@ -1,0 +1,41 @@
+const mongoose = require("mongoose");
+
+const notificationSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    required: true,
+    refPath: 'userModel'
+  },
+  userModel: {
+    type: String,
+    required: true,
+    enum: ['Buyer', 'Seller']
+  },
+  type: {
+    type: String,
+    required: true,
+    enum: ['order_created', 'order_updated', 'order_cancelled', 'request_received', 'request_accepted', 'request_rejected', 'payment_received', 'delivery_scheduled', 'product_available']
+  },
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  data: {
+    orderId: { type: String },
+    productId: { type: mongoose.Schema.Types.ObjectId },
+    requestId: { type: mongoose.Schema.Types.ObjectId },
+    amount: { type: Number },
+    deliveryDate: { type: Date }
+  },
+  isRead: { type: Boolean, default: false },
+  priority: { 
+    type: String, 
+    enum: ['low', 'medium', 'high', 'urgent'], 
+    default: 'medium' 
+  },
+  createdAt: { type: Date, default: Date.now },
+  readAt: { type: Date }
+});
+
+// Index for efficient queries
+notificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
+
+module.exports = mongoose.model("Notification", notificationSchema);

@@ -7,11 +7,25 @@
   background-repeat: no-repeat;
 }
 .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
    background: #ffffff; 
    padding: 30px 40px; 
    border-radius: 8px; 
    box-shadow:inset 2px 2px 6px rgba(0,0,0,0.5); 
  
+}
+
+.container .warning i{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 100px;
+  color: rgb(255, 0, 0);
+  animation: blink 1.5s infinite;
+
 }
 
  h1 {

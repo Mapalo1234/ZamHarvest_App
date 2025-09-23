@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/test.css">
+    <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="all/css/font-awesome.min.css">
     <title>Product Details</title>
 </head>
@@ -25,9 +26,12 @@
         <div class="right-detail">
             <div class="content">
                 <div class="price-container">
+                    <div>
                     <div class="price-lable"></div>
                     <span class="slash">/</span>
                     <div class="scale">ld</div>
+                    </div>
+                    <p class="final-price">Total Price: K<span id="finalPrice">00</span></p>
                 </div>
                 <label class="date-lable" for="date">Delivery Date</label>
                 <div class="delivery-date"><input type="date" placeholder="Delivery" id="deliveryDate" min=""></div>
@@ -42,14 +46,17 @@
                 
                 <div class="buttons">
                     <button class="order" type="button" data-product-id="{{product._id}}">ORDER</button>
-                    <button class="addCart">Add To Cart</button>
+                    <button class="addCart">Message Supplier</button>
                 </div>
-                
-                <button class="btn-negotiate">Negotiate with Supplier <i class="fa fa-comments-o" aria-hidden="true"></i></button>
             </div>
-            <p class="final-price">Total Price: K<span id="finalPrice">00</span></p>
         </div>
     </div>
+      <div class="p-container">
+    <p>
+      Edit, add new availabilities. To create a new listing, click on "Add New Product" below. Have more questions? <br>
+      email us at ZamHarvest@gmail.com.
+    </p>
+  </div>
     <div class="aboutProduct">About Product:</div>
     <div class="description"></div>
     <div class="loader-wrapper">
@@ -58,6 +65,8 @@
 
     <script src="js/counter.js"></script>
     <script src="/js/test.js"></script>
+    <script src="js/notificationSystem.js"></script>
+    <script src="js/authManager.js"></script>
     <script>
       window.addEventListener("load", () => {
         const loaderWrapper = document.querySelector(".loader-wrapper");

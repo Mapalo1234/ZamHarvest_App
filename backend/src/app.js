@@ -11,6 +11,7 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const requestRoutes = require("./routes/requestRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -60,10 +61,16 @@ app.get("/verified", (req, res) => res.render("verify-success"));
 app.get("/add", require("./middleware/checkAuth"), (req, res) => res.render("add"));
 app.get("/listproduct", ensureBuyer, (req, res) => res.render("listproduct"));
 app.get("/view", require("./middleware/checkAuth"), (req, res) => res.render("view"));
+app.get("/notification", (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect("/login");
+  }
+  res.render("notification");
+});
 app.get("/productDetail", (req, res) => res.render("productDetail"));
 app.get("/orderTable", (req, res) => res.render("orderTable"));
 app.get("/pay", (req, res) => res.render("pay"));
-app.get("/request", (req, res) => res.render("request"));
+app.get("/request", require("./middleware/checkAuth"), (req, res) => res.render("request"));
 
 
 // API Routes
@@ -72,6 +79,7 @@ app.use("/", productRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
 app.use("/requests", requestRoutes);
+app.use("/api", notificationRoutes);
 
 // 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));

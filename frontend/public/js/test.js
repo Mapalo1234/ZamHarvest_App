@@ -45,11 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         descEl.innerHTML = `
           <p><span>Category:</span> ${product.category || "N/A"}</p>
-          <p class="organic"><i class="fa fa-pagelines" aria-hidden="true"></i>: ${product.organicStatus || 'N/A'}</p>
+          <p class="organic"><i class="fa fa-pagelines" aria-hidden="true"></i>  ${product.organicStatus || 'N/A'}</p>
           <p><span>Unit:</span> ${product.unit || 'N/A'}</p>
-          <p class="location"><i class="fa fa-map-marker" aria-hidden="true"></i>: ${product.location || 'N/A'}, ${province}</p>
+          <p class="location"><i class="fa fa-map-marker" aria-hidden="true"></i>  ${product.location || 'N/A'}, ${province}</p>
           <p><span>Description:</span> ${product.description || "No description available"}</p>
-          <p class="seller"><i class="fa fa-user" aria-hidden="true"></i>: ${product.sellerId?.username || 'Unknown'}</p>
+          <p class="seller"><i class="fa fa-user" aria-hidden="true"></i>   ${product.sellerId?.username || 'Unknown'}</p>
           <p class="availability">Product: ${product.availability|| 'Available'}</p>
         `;
 

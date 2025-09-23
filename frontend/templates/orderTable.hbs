@@ -12,19 +12,28 @@
 </head>
 <body>
 
-  <header id="navbar">
-    <nav>
-      <a class="logo" href="index.html">ZamHarvest</a>
-      <ul class="menu">
-        <li><a href="/home">Home</a></li>
-        <li><a href="/view">Sale</a></li>
-        <li><a href="/listproduct">Buy</a></li>
-        <li><a href="/orderTable">Orders</a></li>
-      </ul>
-    </nav>
-    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
-     <div class="notfication-logo"><i class="fa fa-bell" aria-hidden="true"></i></div>
-  </header>
+    <header id="navbar">
+        <nav>
+          <a class="logo" href="/home">ZamHarvest</a>
+            <ul class="menu">
+               <li><a href="/view" >Seller</a></li>
+              <li><a href="#" >About</a></li>
+              <li><a href="#" >Resources</a></li>
+              <li><a href="#" >Blog</a></li>
+            </ul>
+          </nav>
+          <div class="login">
+             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
+               <div class="login-dropdown" id="loginDropdown">
+                <!-- Content will be populated by JavaScript based on login status -->
+             </div>
+          </div>
+          <div class="notfication-logo">
+            <i class="fa fa-bell" aria-hidden="true"></i>
+            <span class="badge hidden">0</span>
+          </div>
+
+    </header>
 
 <div class="container">
 
@@ -125,5 +134,10 @@
     });
   </script>
 <script src="js/orderTable.js"></script>
+    <script src="js/app.js"></script>
+    <script src="/js/loginscript.js"></script>
+    <script src="/js/loader.js"></script>
+    <script src="js/notificationSystem.js"></script>
+    <script src="js/authManager.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const Order = require("../models/order");
 const Request = require("../models/request");
+const NotificationService = require("../utils/notificationService");
 
 const router = express.Router();
 
@@ -74,6 +75,25 @@ router.post("/create-order", async (req, res) => {
       status: "pending"
     });
     await request.save();
+
+    // Create notifications
+    await NotificationService.notifyOrderCreated(order);
+    await NotificationService.notifyRequestReceived(request);
+    
+    // Also notify the buyer that their order was created
+    await NotificationService.createNotification(
+      userId,
+      'Buyer',
+      'order_created',
+      'Order Confirmed',
+      `Your order for ${productName} has been confirmed and is being processed.`,
+      {
+        orderId: order.orderId,
+        productId: productId,
+        amount: totalPrice,
+        deliveryDate: deliveryDate
+      }
+    );
 
     res.status(201).json({ message: "Order and request created successfully", order });
   } catch (error) {
