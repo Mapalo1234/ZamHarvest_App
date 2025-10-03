@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['order_created', 'order_updated', 'order_cancelled', 'request_received', 'request_accepted', 'request_rejected', 'payment_received', 'delivery_scheduled', 'product_available']
+    enum: ['order_created', 'order_updated', 'order_cancelled', 'request_received', 'request_accepted', 'request_rejected', 'request_updated', 'payment_received', 'payment_confirmed', 'payment_success', 'payment_failed', 'delivery_scheduled', 'delivery_confirmed', 'seller_rated', 'review_submitted', 'product_available', 'message_received', 'message_sent', 'receipt_available', 'receipt_emailed', 'welcome']
   },
   title: { type: String, required: true },
   message: { type: String, required: true },
@@ -22,6 +22,9 @@ const notificationSchema = new mongoose.Schema({
     orderId: { type: String },
     productId: { type: mongoose.Schema.Types.ObjectId },
     requestId: { type: mongoose.Schema.Types.ObjectId },
+    messageId: { type: mongoose.Schema.Types.ObjectId },
+    senderId: { type: mongoose.Schema.Types.ObjectId },
+    receiverId: { type: mongoose.Schema.Types.ObjectId },
     amount: { type: Number },
     deliveryDate: { type: Date }
   },

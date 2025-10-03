@@ -61,7 +61,27 @@
       </div>
     </div>
 
-    <!-- Step 4 --->
+    <!-- Step 4 - Promotion Settings -->
+    <div class="form-step">
+      <h3>Promotion Settings</h3>
+      <div class="promotion-toggle">
+        <label for="isOnPromotion">
+          <input type="checkbox" id="isOnPromotion" />
+          Enable Promotion
+        </label>
+      </div>
+      <div id="promotionFields" style="display: none;">
+        <input type="number" id="promoPrice" placeholder="Promotional Price" min="0" step="0.01" />
+        <input type="date" id="promotionEndDate" placeholder="Promotion End Date" />
+        <small>Leave end date empty for indefinite promotion</small>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 5 - Inventory Information -->
     <div class="form-step">
       <h3>Inventory Information</h3>
       <label for="availability">Availability:</label>

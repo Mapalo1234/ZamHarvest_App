@@ -228,7 +228,7 @@ class AuthManager {
   bindEvents() {
     // Handle logout
     document.addEventListener('click', (e) => {
-      if (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn')) {
+      if (e.target.id === 'logoutBtn' || (e.target && e.target.closest && e.target.closest('#logoutBtn'))) {
         e.preventDefault();
         this.logout();
       }
@@ -306,4 +306,3 @@ document.addEventListener('DOMContentLoaded', () => {
   window.authManager = new AuthManager();
 });
 
-document.head.appendChild(style);

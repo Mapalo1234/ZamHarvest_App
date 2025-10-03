@@ -51,6 +51,47 @@
     </a>
   </div>
 
+  <!-- Seller Dashboard -->
+  <div class="seller-dashboard">
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Total Products</h3>
+        <span id="totalProducts">0</span>
+      </div>
+      <div class="stat-card">
+        <h3>Average Rating</h3>
+        <div class="rating-display">
+          <span id="averageRating">0.0</span>
+          <div class="stars" id="ratingStars"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Reviews</h3>
+        <span id="totalReviews">0</span>
+      </div>
+    </div>
+    
+    <div class="dashboard-actions">
+      <button class="action-btn" onclick="showReviews()">
+        <i class="fa fa-star"></i> View Reviews
+      </button>
+      <button class="action-btn" onclick="showOrders()">
+        <i class="fa fa-shopping-cart"></i> Manage Orders
+      </button>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div id="reviewsSection" class="reviews-section" style="display: none;">
+    <div class="reviews-header">
+      <h3>Customer Reviews</h3>
+      <button class="close-reviews" onclick="hideReviews()">&times;</button>
+    </div>
+    <div id="sellerReviews" class="reviews-container">
+      <!-- Reviews will be loaded here -->
+    </div>
+  </div>
+
   <h2 style="text-align:center">Your Listing</h2>
   <div class="pro-container" id="productList"></div>
 

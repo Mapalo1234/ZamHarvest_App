@@ -12,6 +12,10 @@ const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const messageRoutes = require("./routes/messageRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const receiptRoutes = require("./routes/receiptRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -71,15 +75,33 @@ app.get("/productDetail", (req, res) => res.render("productDetail"));
 app.get("/orderTable", (req, res) => res.render("orderTable"));
 app.get("/pay", (req, res) => res.render("pay"));
 app.get("/request", require("./middleware/checkAuth"), (req, res) => res.render("request"));
+app.get("/messaging", require("./middleware/ensureAuth"), (req, res) => res.render("messaging"));
 
+// Admin Routes (must be before regular auth routes)
+app.use("/admin", adminRoutes);
 
-// API Routes
+// Legacy Routes (mounted at root)
 app.use("/", authRoutes);
 app.use("/", productRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
+app.use("/", messageRoutes); // Legacy message routes
 app.use("/requests", requestRoutes);
+
+// API Routes (mounted at /api)
 app.use("/api", notificationRoutes);
+app.use("/api", messageRoutes); // API message routes
+app.use("/api", reviewRoutes);
+app.use("/api", receiptRoutes);
+
+// Debug: Log all registered routes
+console.log('Registered API routes:');
+reviewRoutes.stack.forEach((route) => {
+  if (route.route) {
+    const methods = Object.keys(route.route.methods).join(', ').toUpperCase();
+    console.log(`  ${methods} /api${route.route.path}`);
+  }
+});
 
 // 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));

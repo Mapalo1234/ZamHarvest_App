@@ -4,7 +4,7 @@ class NotificationSystem {
     this.unreadCount = 0;
     this.isDropdownOpen = false;
     this.pollingInterval = null;
-    this.pollingDelay = 30000; // 30 seconds
+    this.pollingDelay = 3000; // 3 seconds for auto-refresh
     
     this.init();
   }
@@ -97,9 +97,18 @@ class NotificationSystem {
         throw new Error('Failed to fetch notifications');
       }
 
-      const data = await response.json();
+      const responseData = await response.json();
+      
+      // Handle new API response format
+      const data = responseData.data || responseData;
       this.notifications = data.notifications || [];
-      this.unreadCount = data.unreadCount || 0;
+      
+      // Get unread count separately or calculate it
+      if (data.unreadCount !== undefined) {
+        this.unreadCount = data.unreadCount;
+      } else {
+        this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+      }
       
       this.updateBadge();
       this.renderNotifications();
@@ -133,7 +142,7 @@ class NotificationSystem {
 
   async markAllAsRead() {
     try {
-      const response = await fetch('/api/notifications/read-all', {
+      const response = await fetch('/api/notifications/mark-all-read', {
         method: 'PUT'
       });
 
@@ -206,6 +215,13 @@ class NotificationSystem {
     notificationList.querySelectorAll('.notification-item').forEach(item => {
       item.addEventListener('click', () => {
         const notificationId = item.dataset.id;
+        const notification = this.notifications.find(n => n._id === notificationId);
+        
+        // Handle receipt notifications
+        if (notification && notification.type === 'receipt_available') {
+          this.handleReceiptNotification(notification);
+        }
+        
         this.markAsRead(notificationId);
       });
     });
@@ -219,9 +235,21 @@ class NotificationSystem {
       'request_received': 'request_received',
       'request_accepted': 'request_accepted',
       'request_rejected': 'request_rejected',
+      'request_updated': 'request_updated',
       'payment_received': 'payment_received',
+      'payment_confirmed': 'payment_confirmed',
+      'payment_success': 'payment_confirmed',
+      'payment_failed': 'payment_failed',
       'delivery_scheduled': 'delivery_scheduled',
-      'product_available': 'product_available'
+      'delivery_confirmed': 'delivery_confirmed',
+      'seller_rated': 'seller_rated',
+      'review_submitted': 'review_submitted',
+      'product_available': 'product_available',
+      'message_received': 'message_received',
+      'message_sent': 'message_sent',
+      'receipt_available': 'receipt_available',
+      'receipt_emailed': 'receipt_available',
+      'welcome': 'welcome'
     };
     return iconMap[type] || 'order_created';
   }
@@ -234,9 +262,21 @@ class NotificationSystem {
       'request_received': 'fa-handshake-o',
       'request_accepted': 'fa-check-circle',
       'request_rejected': 'fa-times-circle',
+      'request_updated': 'fa-edit',
       'payment_received': 'fa-money',
+      'payment_confirmed': 'fa-check-circle',
+      'payment_success': 'fa-check-circle',
+      'payment_failed': 'fa-times-circle',
       'delivery_scheduled': 'fa-truck',
-      'product_available': 'fa-gift'
+      'delivery_confirmed': 'fa-check-circle',
+      'seller_rated': 'fa-star',
+      'review_submitted': 'fa-star',
+      'product_available': 'fa-gift',
+      'message_received': 'fa-envelope',
+      'message_sent': 'fa-paper-plane',
+      'receipt_available': 'fa-file-text',
+      'receipt_emailed': 'fa-file-text',
+      'welcome': 'fa-heart'
     };
     return symbolMap[type] || 'fa-bell';
   }
@@ -292,11 +332,14 @@ class NotificationSystem {
   }
 
   startPolling() {
-    // Poll for new notifications every 30 seconds
+    // Poll for new notifications every 3 seconds
     this.pollingInterval = setInterval(() => {
       if (!this.isDropdownOpen) {
         this.loadNotifications();
       }
+      // Always refresh messages and orders
+      this.refreshMessages();
+      this.refreshOrders();
     }, this.pollingDelay);
   }
 
@@ -315,6 +358,41 @@ class NotificationSystem {
   // Public method to manually refresh notifications
   refresh() {
     this.loadNotifications();
+  }
+
+  // Refresh messages if messaging system is available
+  refreshMessages() {
+    if (window.messagingSystem && typeof window.messagingSystem.loadMessages === 'function') {
+      window.messagingSystem.loadMessages();
+    }
+  }
+
+  // Refresh orders if order table system is available
+  refreshOrders() {
+    if (window.refreshOrders && typeof window.refreshOrders === 'function') {
+      window.refreshOrders();
+    } else if (window.fetchOrders && typeof window.fetchOrders === 'function') {
+      window.fetchOrders();
+    }
+  }
+
+  // Handle receipt notification click
+  handleReceiptNotification(notification) {
+    if (window.receiptSystem && notification.data) {
+      // Create order data from notification
+      const orderData = {
+        orderId: notification.data.orderId,
+        productName: notification.data.productName,
+        totalPrice: notification.data.amount,
+        quantity: 1, // Default quantity
+        unit: 'unit',
+        sellerName: 'Seller',
+        paidStatus: 'Paid'
+      };
+      
+      // Show receipt
+      window.receiptSystem.showReceipt(orderData);
+    }
   }
 
   // Cleanup method

@@ -230,25 +230,6 @@ a{
 
 /* running time */
 
-/* .carousel .time{
-    position: absolute;
-    z-index: 1000;
-    width: 0%;
-    height: 3px;
-    background-color: #f1683a;
-    left: 0;
-    top: 0;
-}
-
-.carousel.next .time,
-.carousel.prev .time{
-    animation: runningTime 3s linear 1 forwards;
-}
-@keyframes runningTime{
-    from{ width: 100%}
-    to{width: 0}
-} */
-
 
 /* prev click */
 
@@ -366,5 +347,31 @@ a{
     height: 350px;
     max-width: 100%;
     object-fit: contain;
+  }
+
+  /* response to small screen */
+  @media (max-width: 768px) {
+    .hero-section {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    body {
+      width: 100%;
+      
+    }
+  
+    .hero-content {
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .hero-image {
+      margin-left: 0;
+    }
+  
+    .hero-image img {
+      height: 250px;
+    }
   }
   

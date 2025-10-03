@@ -49,6 +49,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       return allProducts.slice();
     }
 
+    // Handle promotions filter
+    if (categoryId === "promotions") {
+      return allProducts.filter(product => {
+        // Check if product is on promotion and not expired
+        const isPromotionActive = product.isOnPromotion && 
+          (!product.promotionEndDate || new Date(product.promotionEndDate) > new Date());
+        return isPromotionActive;
+      });
+    }
+
     const matchList = CATEGORY_MAP[categoryId] || [categoryId.toLowerCase()];
     return allProducts.filter(p => {
       const catVal = normalizeCategoryValue(p.category);
@@ -60,7 +70,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const response = await fetch("/products");
       if (!response.ok) throw new Error("Unauthorized or error");
-      allProducts = await response.json();
+      const responseData = await response.json();
+      
+      // Handle new API response format
+      allProducts = responseData.data || responseData;
+      
+      if (!Array.isArray(allProducts)) {
+        console.error("Products data is not an array:", allProducts);
+        throw new Error("Invalid products data format");
+      }
+      
+      // Debug: Log first product's seller data
+      if (allProducts.length > 0) {
+        console.log('First product seller data:', allProducts[0].sellerId);
+      }
 
       const term = searchTerm.toLowerCase();
 
@@ -106,10 +129,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     currentItems.forEach(product => {
+      // Check if product is on promotion and not expired
+      const isPromotionActive = product.isOnPromotion && 
+        (!product.promotionEndDate || new Date(product.promotionEndDate) > new Date());
+
       productList.innerHTML += `
         <div class="pro" onclick="viewProduct('${product._id}')">
           <div class="image-box">
             <img src="${product.image}" alt="${product.name}">
+            ${isPromotionActive ? '<div class="promo-badge">PROMO</div>' : ''}
           </div>
           <div class="des">
            <p class="${product.availability === 'Available' ? 'available' : 'unavailable'}">
@@ -117,7 +145,43 @@ document.addEventListener("DOMContentLoaded", async () => {
           </p>
             <span class="category">${product.category}</span>
             <h5>${product.name}</h5>
-            <h4>K${product.price} | ${product.unit}</h4>
+            <div class="seller-info">
+              <div class="seller-rating">
+                <span class="seller-name">${product.sellerId?.username || 'Unknown Seller'}</span>
+                ${(() => {
+                  // Debug: Log seller data
+                  console.log('Seller data for', product.sellerId?.username, ':', {
+                    averageRating: product.sellerId?.averageRating,
+                    totalReviews: product.sellerId?.totalReviews,
+                    totalPoints: product.sellerId?.totalPoints,
+                    hasRating: !!product.sellerId?.averageRating
+                  });
+                  
+                  return product.sellerId?.averageRating ? `
+                    <div class="rating-stars">
+                      ${generateStarHtml(product.sellerId.averageRating)}
+                    </div>
+                    <span class="seller-points">${product.sellerId.totalPoints || 0} pts</span>
+                  ` : `
+                    <div class="rating-stars no-rating">
+                      <i class="fa fa-star-o"></i>
+                      <i class="fa fa-star-o"></i>
+                      <i class="fa fa-star-o"></i>
+                      <i class="fa fa-star-o"></i>
+                      <i class="fa fa-star-o"></i>
+                    </div>
+                    <span class="seller-points">${product.sellerId?.totalPoints || 0} pts</span>
+                  `;
+                })()}
+              </div>
+            </div>
+            <div class="price-container">
+              ${isPromotionActive ? 
+                `<h4 class="promo-price">K${product.promoPrice} | ${product.unit}</h4>
+                 <h4 class="original-price">K${product.price}</h4>` : 
+                `<h4>K${product.price} | ${product.unit}</h4>`
+              }
+            </div>
           </div>
           <a href="/productDetail" onclick='localStorage.setItem("selectedProductId", "${product._id}")'>
             <i class="fa fa-shopping-cart cart" aria-hidden="true"></i>
@@ -162,6 +226,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const activeTab = document.querySelector(".tab_btn.active")?.id || "all";
     loadProducts(searchTerm, activeTab);
   });
+
+  // Helper function to generate star HTML
+  function generateStarHtml(rating) {
+    let stars = '';
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars += '<span class="star-display active">★</span>';
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars += '<span class="star-display half">★</span>';
+      } else {
+        stars += '<span class="star-display">★</span>';
+      }
+    }
+    return stars;
+  }
 
   loadProducts(); // Initial load
 });

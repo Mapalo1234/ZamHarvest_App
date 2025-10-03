@@ -397,6 +397,42 @@ nav .logo {
   background: #00BCD4;
 }
 
+.notification-icon.request_updated {
+  background: #2196F3;
+}
+
+.notification-icon.payment_confirmed {
+  background: #4CAF50;
+}
+
+.notification-icon.payment_failed {
+  background: #f44336;
+}
+
+.notification-icon.delivery_confirmed {
+  background: #4CAF50;
+}
+
+.notification-icon.seller_rated {
+  background: #FFD700;
+}
+
+.notification-icon.review_submitted {
+  background: #FFD700;
+}
+
+.notification-icon.message_received {
+  background: #2196F3;
+}
+
+.notification-icon.message_sent {
+  background: #4CAF50;
+}
+
+.notification-icon.welcome {
+  background: #E91E63;
+}
+
 .notification-details {
   flex: 1;
   min-width: 0;

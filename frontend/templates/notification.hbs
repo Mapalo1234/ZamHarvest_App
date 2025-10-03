@@ -129,6 +129,26 @@
       flex-shrink: 0;
     }
     
+    /* Notification type specific styles */
+    .notification-icon-page.order_created { background: #4CAF50; }
+    .notification-icon-page.order_updated { background: #2196F3; }
+    .notification-icon-page.order_cancelled { background: #f44336; }
+    .notification-icon-page.request_received { background: #FF9800; }
+    .notification-icon-page.request_accepted { background: #4CAF50; }
+    .notification-icon-page.request_rejected { background: #f44336; }
+    .notification-icon-page.request_updated { background: #2196F3; }
+    .notification-icon-page.payment_received { background: #4CAF50; }
+    .notification-icon-page.payment_confirmed { background: #4CAF50; }
+    .notification-icon-page.payment_failed { background: #f44336; }
+    .notification-icon-page.delivery_scheduled { background: #FF9800; }
+    .notification-icon-page.delivery_confirmed { background: #4CAF50; }
+    .notification-icon-page.seller_rated { background: #FFD700; }
+    .notification-icon-page.review_submitted { background: #FFD700; }
+    .notification-icon-page.product_available { background: #9C27B0; }
+    .notification-icon-page.message_received { background: #2196F3; }
+    .notification-icon-page.message_sent { background: #4CAF50; }
+    .notification-icon-page.welcome { background: #E91E63; }
+    
     .notification-details-page {
       flex: 1;
     }
@@ -233,30 +253,6 @@
   </style>
 </head>
 <body>
-    <header id="navbar">
-        <nav>
-          <a class="logo" href="/home">ZamHarvest</a>
-            <ul class="menu">
-              <li>
-                <a>Marketplace</a>
-                <ul class="submenu">
-                  <li><a href="/listproduct">Buyer</a></li>
-                  <li><a href="/view" >Seller</a></li>
-                </ul>
-              </li>
-              <li><a href="#" >About</a></li>
-              <li><a href="#" >Resources</a></li>
-              <li><a href="#" >Blog</a></li>
-            </ul>
-          </nav>
-          <div class="login">
-             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
-               <div class="login-dropdown" id="loginDropdown">
-                <!-- Content will be populated by JavaScript based on login status -->
-             </div>
-          </div>
-
-    </header>
 
   <div class="notification-page">
     <h1>Notifications</h1>
@@ -284,6 +280,8 @@
       <button class="filter-btn" data-filter="orders">Orders</button>
       <button class="filter-btn" data-filter="requests" id="requestsFilter" style="display: none;">Requests</button>
       <button class="filter-btn" data-filter="payments">Payments</button>
+      <button class="filter-btn" data-filter="delivery">Delivery</button>
+      <button class="filter-btn" data-filter="reviews">Reviews</button>
     </div>
     
     <!-- Notifications Container -->
@@ -380,7 +378,10 @@
           const response = await fetch('/api/notifications');
           if (!response.ok) throw new Error('Failed to fetch notifications');
           
-          const data = await response.json();
+          const responseData = await response.json();
+          
+          // Handle new API response format
+          const data = responseData.data || responseData;
           this.notifications = data.notifications || [];
           this.updateStats();
           this.applyFilter();
@@ -411,7 +412,7 @@
             break;
           case 'orders':
             this.filteredNotifications = this.notifications.filter(n => 
-              n.type.includes('order') || n.type.includes('delivery')
+              n.type.includes('order') || n.type.includes('request')
             );
             break;
           case 'requests':
@@ -422,6 +423,16 @@
           case 'payments':
             this.filteredNotifications = this.notifications.filter(n => 
               n.type.includes('payment')
+            );
+            break;
+          case 'delivery':
+            this.filteredNotifications = this.notifications.filter(n => 
+              n.type.includes('delivery')
+            );
+            break;
+          case 'reviews':
+            this.filteredNotifications = this.notifications.filter(n => 
+              n.type.includes('review') || n.type.includes('seller_rated')
             );
             break;
           default:
@@ -513,7 +524,7 @@
       
       async markAllAsRead() {
         try {
-          const response = await fetch('/api/notifications/read-all', {
+          const response = await fetch('/api/notifications/mark-all-read', {
             method: 'PUT'
           });
           
@@ -558,9 +569,18 @@
           'request_received': 'request_received',
           'request_accepted': 'request_accepted',
           'request_rejected': 'request_rejected',
+          'request_updated': 'request_updated',
           'payment_received': 'payment_received',
+          'payment_confirmed': 'payment_confirmed',
+          'payment_failed': 'payment_failed',
           'delivery_scheduled': 'delivery_scheduled',
-          'product_available': 'product_available'
+          'delivery_confirmed': 'delivery_confirmed',
+          'seller_rated': 'seller_rated',
+          'review_submitted': 'review_submitted',
+          'product_available': 'product_available',
+          'message_received': 'message_received',
+          'message_sent': 'message_sent',
+          'welcome': 'welcome'
         };
         return iconMap[type] || 'order_created';
       }
@@ -573,9 +593,18 @@
           'request_received': 'fa-handshake-o',
           'request_accepted': 'fa-check-circle',
           'request_rejected': 'fa-times-circle',
+          'request_updated': 'fa-edit',
           'payment_received': 'fa-money',
+          'payment_confirmed': 'fa-check-circle',
+          'payment_failed': 'fa-times-circle',
           'delivery_scheduled': 'fa-truck',
-          'product_available': 'fa-gift'
+          'delivery_confirmed': 'fa-check-circle',
+          'seller_rated': 'fa-star',
+          'review_submitted': 'fa-star',
+          'product_available': 'fa-gift',
+          'message_received': 'fa-envelope',
+          'message_sent': 'fa-paper-plane',
+          'welcome': 'fa-heart'
         };
         return symbolMap[type] || 'fa-bell';
       }

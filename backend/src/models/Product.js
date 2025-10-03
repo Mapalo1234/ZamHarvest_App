@@ -4,6 +4,9 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true, min: 0 },
+  promoPrice: { type: Number, min: 0 },
+  isOnPromotion: { type: Boolean, default: false },
+  promotionEndDate: { type: Date },
   category: { type: String, required: true },
   province: { type: String, required: true },
   location: { type: String, required: true },
@@ -11,16 +14,14 @@ const productSchema = new mongoose.Schema({
   image: { type: String, required: true },
   sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "Seller", required: true },
   sellername: { type: String, required: true },
-  stock: { type: Number, default: 0, min: 0 },
   unit: { type: String, default: "kg" },
     availability: { 
     type: String, 
     enum: ["Available", "Unavailable"], 
     default: "Available"
   },
-  harvestDate: { type: Date },
-  expiryDate: { type: Date },
   isActive: { type: Boolean, default: true },
+  isDummyProduct: { type: Boolean, default: false }, // Flag to mark dummy messaging products
   createdAt: {
     type: Date,
     default: Date.now

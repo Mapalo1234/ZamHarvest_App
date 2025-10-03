@@ -13,37 +13,137 @@
 </head>
 <body>
 
-  <header id="navbar">
-    <nav>
-      <a class="logo" href="/home">ZamHarvest</a>
-      <ul class="menu">
-        <li><a href="/home">Home</a></li>
-        <li><a href="/view">Dashboard</a></li>
-        <li><a href="/orderTable">Requests</a></li>
-      </ul>
-    </nav>
-    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
-     <div class="notfication-logo"><i class="fa fa-bell" aria-hidden="true"></i></div>
-  </header>
+  <div class="dashboard-container">
+    <!-- Home Button -->
+    <div class="home-button">
+      <a href="/home" title="Go Home">
+        <i class="fa fa-home"></i>
+      </a>
+    </div>
+    
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1>Seller Dashboard</h1>
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <i class="fa fa-shopping-cart"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="totalRequests">0</span>
+          <span class="stat-label">Total Requests</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-check-circle"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="acceptedRequests">0</span>
+          <span class="stat-label">Accepted</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-clock-o"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="pendingRequests">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-dollar"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="totalEarnings">K0</span>
+          <span class="stat-label">Earnings</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="container">
 
-  <h2>cRequests</h2>
- <table class="request-table">
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Buyer</th>
-      <th>Quantity</th>
-      <th>Unit</th>
-      <th>Total Price</th>
-      <th>Delivery Date</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody class="orderInfo"></tbody>
-</table>
+  <!-- Main Content Tabs -->
+  <div class="dashboard-tabs">
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="switchTab('requests')">
+        <i class="fa fa-inbox"></i>
+        Requests
+      </button>
+      <button class="tab-btn" onclick="switchTab('analytics')">
+        <i class="fa fa-chart-bar"></i>
+        Analytics
+      </button>
+      <button class="tab-btn" onclick="switchTab('notifications')">
+        <i class="fa fa-bell"></i>
+        Notifications
+      </button>
+    </div>
+
+    <!-- Requests Tab -->
+    <div id="requests-tab" class="tab-content active">
+      <div class="table-header">
+        <h3>Recent Requests</h3>
+        <div class="table-controls">
+          <select id="statusFilter" onchange="filterRequests()">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="request-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th>Buyer</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th>Total Price</th>
+              <th>Delivery Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody class="orderInfo"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics-tab" class="tab-content">
+      <div class="analytics-grid">
+        <div class="chart-container">
+          <h4>Request Trends</h4>
+          <div class="chart-placeholder">
+            <i class="fa fa-chart-line"></i>
+            <p>Request trends over time</p>
+          </div>
+        </div>
+        <div class="chart-container">
+          <h4>Top Products</h4>
+          <div class="chart-placeholder">
+            <i class="fa fa-chart-pie"></i>
+            <p>Most requested products</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div id="notifications-tab" class="tab-content">
+      <div class="notifications-container">
+        <h4>Recent Notifications</h4>
+        <div class="notifications-list" id="notificationsList">
+          <div class="notification-item">
+            <i class="fa fa-info-circle"></i>
+            <div class="notification-content">
+              <p>Welcome to your seller dashboard!</p>
+              <span class="notification-time">Just now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
   <div id="editPriceModal" class="modal" style="display:none;">

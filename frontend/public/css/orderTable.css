@@ -27,13 +27,13 @@ body {
     flex-direction: column;
     align-items: center ;
     min-height: 100vh;
-    padding: 20px;
+    /* padding: 20px; */
 }
 
 /* Main Container */
 .container {
-    width: 95%;
-    max-width: 1200px;
+    width: 100%;
+    /* max-width: 1200px; */
     padding: 20px;
     background: white;
     border-radius: 12px;
@@ -116,9 +116,15 @@ header .addMemberBtn button {
 
 table tr th,
 table tr td {
-    padding: 12px 15px;
+    padding: 8px 4px;
     color: rgb(0, 0, 0);
     border-bottom: 1px solid var(--dark6);
+}
+
+/* Action column styling to prevent wrapping */
+table tr td:last-child {
+    white-space: nowrap;
+    min-width: 120px;
 }
 
 table tr{
@@ -138,18 +144,21 @@ table tbody tr:hover {
     transition: 0.3s;
 }
 
-/* Table Action Buttons */
+/* Table Action Buttons - Match requestTable style exactly */
 table td button {
-    margin: 0 5px;
+    margin: 0 3px;
     padding: 6px;
     width: 36px;
     background: var(--dark5);
     color: var(--dark8);
-    font-size: 14px;
-    border: 1px solid var(--dark7);
-    border-radius: 5px;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
     transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
 table td button:hover {
@@ -219,7 +228,7 @@ footer .pagination button.active {
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 20000;
+    z-index: 1000;
 }
 
 .dark_bg.active {
@@ -307,6 +316,246 @@ footer .pagination button.active {
     width: 100%;
 }
 
+
+/* Status Styles */
+.status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-pending {
+    border: 1px solid #7f6310;
+    color: #7f6310;
+    border: 1px solid #ffeaa7;
+}
+
+.status-accepted {
+    border: 1px solid #155724;
+    color: #155724;
+}
+
+.status-rejected {
+    color: #721c24;
+    border: 1px solid #721c24;
+}
+
+.status-paid {
+    color: #004085;
+    border: 1px solid #004085;
+}
+
+.status-shipped {
+    color: #856404;
+    border: 1px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+.status-delivered {
+    color: #155724;
+    border: 1px solid #28a745;
+    background-color: #d4edda;
+}
+
+/* Action Button Styles */
+.action-btn {
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-btn.payment {
+    background: #007bff;
+    color: white;
+}
+
+.action-btn.payment:hover {
+    background: #0056b3;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.action-btn.delivery {
+    background: #28a745;
+    color: white;
+}
+
+.action-btn.delivery:hover {
+    background: #218838;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(40,167,69,0.3);
+}
+
+.action-btn.review {
+    background: #ffc107;
+    color: #212529;
+}
+
+.action-btn.review:hover {
+    background: #e0a800;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(255,193,7,0.3);
+}
+
+.action-btn.disabled {
+    background: #6c757d;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.action-btn.disabled:hover {
+    transform: none;
+    background: #6c757d;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Add focus styles for accessibility */
+.action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.action-btn.payment:focus {
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.action-btn.delivery:focus {
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.25);
+}
+
+.action-btn.review:focus {
+    box-shadow: 0 0 0 3px rgba(255,193,7,0.25);
+}
+
+/* Add active state for better feedback */
+.action-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Ensure icons are properly centered */
+.action-btn i {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Info and Smart Action Button Styles - Match requestTable */
+.info-btn, .smart-btn {
+    margin: 0 2px;
+    padding: 8px;
+    width: 32px;
+    background: var(--dark5);
+    color: var(--dark8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* Smart button in cancel mode */
+.smart-btn.cancel-mode {
+    background: #edc243;
+    color: #212529;
+}
+
+.smart-btn.cancel-mode:hover {
+    background: #d4ac0d;
+    color: #212529;
+}
+
+/* Smart button in delete mode */
+.smart-btn.delete-mode {
+    background: #dc3545;
+    color: white;
+}
+
+.smart-btn.delete-mode:hover {
+    background: #c82333;
+    color: white;
+}
+
+/* Button text styling */
+.smart-btn .btn-text {
+    font-size: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Legacy button styles for backward compatibility - Match requestTable */
+.cancel-btn, .delete-btn {
+    margin: 0 2px;
+    padding: 4px;
+    width: 32px;
+    background: var(--dark5);
+    color: var(--dark8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.cancel-btn {
+    background: #edc243;
+    color: #212529;
+}
+
+.cancel-btn:hover {
+    background: #d4ac0d;
+    color: #212529;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    color: white;
+}
+
+.info-btn:hover {
+    background: #5a6268;
+}
+
+.delete-btn:hover {
+    background: #dc3545;
+}
+
+/* Disabled button styles */
+.purchase-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #ccc !important;
+    color: #666 !important;
+}
+
+.purchase-btn:disabled:hover {
+    background: #ccc !important;
+    color: #666 !important;
+}
 
 /* ---------- Modal Background ---------- */
 .modal {

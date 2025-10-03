@@ -224,4 +224,42 @@ button.prev-btn:hover {
   color: white;
 }
 
+/* Promotion styles */
+.promotion-toggle {
+  margin-bottom: 15px;
+}
+
+.promotion-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.promotion-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--highlight-color);
+}
+
+#promotionFields {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+#promotionFields input {
+  margin-bottom: 10px;
+}
+
+#promotionFields small {
+  color: #6c757d;
+  font-size: 12px;
+  display: block;
+  margin-top: 5px;
+}
+
 

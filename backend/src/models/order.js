@@ -12,9 +12,14 @@ const orderSchema = new mongoose.Schema({
   sellerName: { type: String, required: true },
   unit: { type: String, required: true },
   deliveryDate: { type: Date, required: true },
-  paidStatus: { type: String, enum: ["Pending", "Paid"], default: "Pending" },
+  requestStatus: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
+  paidStatus: { type: String, enum: ["Pending", "Paid", "Rejected"], default: "Pending" },
+  deliveryStatus: { type: String, enum: ["Pending", "Shipped", "Delivered", "Cancelled"], default: "Pending" },
+  deliveredAt: { type: Date },
+  canReview: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-  sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "Seller", required: true }
+  sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "Seller", required: true },
+  requestId: { type: mongoose.Schema.Types.ObjectId, ref: "Request" } // Link to request
 });
 
 module.exports = mongoose.model("Order", orderSchema);

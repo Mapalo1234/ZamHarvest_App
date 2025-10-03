@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const provinceSelect = document.getElementById("province");
   const locationSelect = document.getElementById("location");
+  const isOnPromotionCheckbox = document.getElementById("isOnPromotion");
+  const promotionFields = document.getElementById("promotionFields");
 
   let currentStep = 0;
   let uploadedImage = null;
@@ -47,6 +49,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Promotion toggle functionality
+  isOnPromotionCheckbox.addEventListener("change", () => {
+    if (isOnPromotionCheckbox.checked) {
+      promotionFields.style.display = "block";
+    } else {
+      promotionFields.style.display = "none";
+      // Clear promotion fields when unchecked
+      document.getElementById("promoPrice").value = "";
+      document.getElementById("promotionEndDate").value = "";
+    }
+  });
+
   function showStep(index) {
     steps.forEach((step, i) => {
       step.classList.toggle("active", i === index);
@@ -57,11 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputs = steps[index].querySelectorAll("input, select, textarea");
     for (const input of inputs) {
       if (input.hasAttribute("required") && !input.value.trim()) {
-        alert("Please fill in all required fields.");
+        alert(`Please fill in the required field: ${input.placeholder || input.id || 'this field'}`);
         input.focus();
         return false;
       }
-      if (input.type === "number" && Number(input.value) < 0) {
+      if (input.type === "number" && input.value && Number(input.value) < 0) {
         alert("Price cannot be negative.");
         input.focus();
         return false;
@@ -138,36 +152,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ Load data if in edit mode
   if (editId) {
-    const products = JSON.parse(localStorage.getItem("products") || "[]");
-    const editId = localStorage.getItem("editProductId");
-    const product = products.find(p => p._id === editId);
-    console.log("Editing product:", products);
-    if (product) {
-      isEdit = true;
-      document.getElementById("formTitle").textContent = "Edit Product";
+    console.log("Edit mode detected, fetching product data for ID:", editId);
+    
+    // Fetch product data from server instead of localStorage
+    fetch('/products')
+      .then(response => response.json())
+      .then(responseData => {
+        // Handle new API response format
+        const products = responseData.data || responseData;
+        
+        if (!Array.isArray(products)) {
+          console.error("Products data is not an array:", products);
+          alert("Error: Unable to load products for editing.");
+          return;
+        }
+        
+        const product = products.find(p => p._id === editId);
+        console.log("Editing product:", product);
+        
+        if (product) {
+          isEdit = true;
+          document.getElementById("formTitle").textContent = "Edit Product";
+          console.log("Product data for editing:", product);
 
-      // Populate all fields
+      // Populate all fields with proper fallbacks
       document.getElementById("name").value = product.name || "";
       document.getElementById("price").value = product.price || "";
       document.getElementById("category").value = product.category || "";
       provinceSelect.value = product.province || "";
 
-      // Trigger town list population
-      provinceSelect.dispatchEvent(new Event("change"));
-      locationSelect.value = product.location || "";
+      // Trigger town list population and wait for it to complete
+      if (product.province) {
+        provinceSelect.dispatchEvent(new Event("change"));
+        // Use setTimeout to ensure the location options are populated before setting the value
+        setTimeout(() => {
+          locationSelect.value = product.location || "";
+        }, 100);
+      }
+      
       document.getElementById("availability").value = product.availability || "Available";
       document.getElementById("organicStatus").value = product.organicStatus || "Non-Organic";
       document.getElementById("description").value = product.description || "";
-      document.getElementById("unit").value = product.unit || "kg";
-      document.getElementById("harvestDate").value = product.harvestDate || "";
-      document.getElementById("expiryDate").value = product.expiryDate || "";
+          document.getElementById("unit").value = product.unit || "kg";
+          document.getElementById("harvestDate").value = product.harvestDate || "";
+          document.getElementById("expiryDate").value = product.expiryDate || "";
 
-      if (product.image) {
-        imageView.style.backgroundImage = `url(${product.image})`;
-        imageView.innerHTML = "";
-        uploadedImage = product.image;
-      }
-    }
+          // Populate promotion fields
+          if (product.isOnPromotion) {
+            isOnPromotionCheckbox.checked = true;
+            promotionFields.style.display = "block";
+            document.getElementById("promoPrice").value = product.promoPrice || "";
+            document.getElementById("promotionEndDate").value = product.promotionEndDate || "";
+          } else {
+            isOnPromotionCheckbox.checked = false;
+            promotionFields.style.display = "none";
+          }
+
+          if (product.image) {
+            imageView.style.backgroundImage = `url(${product.image})`;
+            imageView.innerHTML = "";
+            uploadedImage = product.image;
+          }
+
+          // Verify field population after a short delay
+          setTimeout(() => {
+            console.log("Field population verification:");
+            console.log("Name:", document.getElementById("name").value);
+            console.log("Price:", document.getElementById("price").value);
+            console.log("Category:", document.getElementById("category").value);
+            console.log("Province:", provinceSelect.value);
+            console.log("Location:", locationSelect.value);
+            console.log("Availability:", document.getElementById("availability").value);
+            console.log("Organic Status:", document.getElementById("organicStatus").value);
+            console.log("Description:", document.getElementById("description").value);
+            console.log("Unit:", document.getElementById("unit").value);
+            console.log("Harvest Date:", document.getElementById("harvestDate").value);
+            console.log("Expiry Date:", document.getElementById("expiryDate").value);
+          }, 200);
+        } else {
+          console.error("Product not found with ID:", editId);
+          alert("Product not found. Redirecting to add new product.");
+          localStorage.removeItem("editProductId");
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching product data:", error);
+        alert("Error loading product data. Please try again.");
+        localStorage.removeItem("editProductId");
+      });
   }
 
   // ✅ Submit form (Handle Add or Edit)
@@ -191,7 +263,10 @@ document.addEventListener("DOMContentLoaded", () => {
       image: uploadedImage,
       unit: document.getElementById("unit").value || "kg",
       harvestDate: document.getElementById("harvestDate").value || null,
-      expiryDate: document.getElementById("expiryDate").value || null
+      expiryDate: document.getElementById("expiryDate").value || null,
+      isOnPromotion: isOnPromotionCheckbox.checked,
+      promoPrice: isOnPromotionCheckbox.checked ? Number(document.getElementById("promoPrice").value) || null : null,
+      promotionEndDate: isOnPromotionCheckbox.checked ? (document.getElementById("promotionEndDate").value || null) : null
     };
 
     try {
@@ -207,18 +282,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.text();
        alert(result);
 
-      // ✅ Update localStorage if edit mode
+      // ✅ Clear edit mode
       if (isEdit) {
-        const products = JSON.parse(localStorage.getItem("products") || "[]");
-        const index = products.findIndex(p => p.id == editId);
-        if (index > -1) {
-          products[index] = { ...products[index], ...productData };
-          localStorage.setItem("products", JSON.stringify(products));
-        }
         localStorage.removeItem("editProductId");
       }
 
-      window.location.href = "/productDetail";
+      window.location.href = "/view";
     } catch (error) {
       console.error("Error submitting product:", error);
       alert("Failed to submit product.");

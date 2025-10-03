@@ -11,9 +11,18 @@ const pageIndicator = document.getElementById('pageIndicator');
 async function loadProducts(searchTerm = "", page = 1) {
   try {
     const response = await fetch('/products');
-    const products = await response.json();
+    const responseData = await response.json();
+    
+    // Handle new API response format
+    const products = responseData.data || responseData;
+    
+    if (!Array.isArray(products)) {
+      console.error("Products data is not an array:", products);
+      productList.innerHTML = "<p>Error: Invalid products data format.</p>";
+      return;
+    }
+    
     //  localStorage.setItem("products", JSON.stringify(products));
-
 
     const term = searchTerm.toLowerCase();
     allProducts = products.filter(product => {
@@ -41,13 +50,24 @@ async function loadProducts(searchTerm = "", page = 1) {
       const productDiv = document.createElement('div');
       productDiv.className = 'pro';
 
+      // Check if product is on promotion and not expired
+      const isPromotionActive = product.isOnPromotion && 
+        (!product.promotionEndDate || new Date(product.promotionEndDate) > new Date());
+
       productDiv.innerHTML = `
         <img src="${product.image}" alt="${product.name}">
+        ${isPromotionActive ? '<div class="promo-badge">PROMO</div>' : ''}
         <div class="des">
           <span class="category">${product.category}</span>
           <h5>${product.name}</h5>
           <h6><i class="fa fa-map-marker"></i> &#9658; ${product.location}</h6>
-          <h4>K${product.price}</h4>
+          <div class="price-container">
+            ${isPromotionActive ? 
+              `<h4 class="promo-price">K${product.promoPrice}</h4>
+               <h4 class="original-price">K${product.price}</h4>` : 
+              `<h4>K${product.price}</h4>`
+            }
+          </div>
           <div class="inventory-info">
             ${product.organicStatus ? `<span class="organic">${product.organicStatus}</span>` : ''}
           </div>
@@ -150,5 +170,141 @@ function updateStock(productId, productName, currentStock, currentUnit) {
   });
 }
 
+// Seller Dashboard Functions
+async function loadSellerStats() {
+  try {
+    // Get seller's products to count them
+    const response = await fetch('/products');
+    const responseData = await response.json();
+    
+    // Handle new API response format
+    const products = responseData.data || responseData;
+    
+    if (!Array.isArray(products)) {
+      console.error("Products data is not an array:", products);
+      return;
+    }
+    
+    // Count products
+    const totalProducts = products.length;
+    document.getElementById('totalProducts').textContent = totalProducts;
+    
+    // Get seller's reviews
+    const sellerId = products[0]?.sellerId?._id || products[0]?.sellerId;
+    if (sellerId) {
+      const reviewsResponse = await fetch(`/api/reviews/seller/${sellerId}`);
+      const reviewsData = await reviewsResponse.json();
+      
+      if (reviewsData.reviews && reviewsData.reviews.length > 0) {
+        const totalReviews = reviewsData.reviews.length;
+        const averageRating = reviewsData.reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+        
+        document.getElementById('totalReviews').textContent = totalReviews;
+        document.getElementById('averageRating').textContent = averageRating.toFixed(1);
+        
+        // Display stars
+        const starsContainer = document.getElementById('ratingStars');
+        starsContainer.innerHTML = generateStarHtml(averageRating);
+      } else {
+        document.getElementById('totalReviews').textContent = '0';
+        document.getElementById('averageRating').textContent = '0.0';
+        document.getElementById('ratingStars').innerHTML = generateStarHtml(0);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading seller stats:', error);
+  }
+}
+
+function generateStarHtml(rating) {
+  let stars = '';
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  
+  for (let i = 1; i <= 5; i++) {
+    if (i <= fullStars) {
+      stars += '<span class="star-display active">★</span>';
+    } else if (i === fullStars + 1 && hasHalfStar) {
+      stars += '<span class="star-display half">★</span>';
+    } else {
+      stars += '<span class="star-display">★</span>';
+    }
+  }
+  return stars;
+}
+
+function showReviews() {
+  const reviewsSection = document.getElementById('reviewsSection');
+  reviewsSection.style.display = 'block';
+  loadSellerReviews();
+}
+
+function hideReviews() {
+  const reviewsSection = document.getElementById('reviewsSection');
+  reviewsSection.style.display = 'none';
+}
+
+async function loadSellerReviews() {
+  try {
+    const response = await fetch('/products');
+    const responseData = await response.json();
+    
+    // Handle new API response format
+    const products = responseData.data || responseData;
+    
+    if (!Array.isArray(products) || products.length === 0) {
+      console.error("No products data available");
+      return;
+    }
+    
+    const sellerId = products[0]?.sellerId?._id || products[0]?.sellerId;
+    if (sellerId) {
+      const reviewsResponse = await fetch(`/api/reviews/seller/${sellerId}`);
+      const reviewsData = await reviewsResponse.json();
+      
+      displaySellerReviews(reviewsData.reviews || []);
+    }
+  } catch (error) {
+    console.error('Error loading seller reviews:', error);
+  }
+}
+
+function displaySellerReviews(reviews) {
+  const reviewsContainer = document.getElementById('sellerReviews');
+  
+  if (reviews.length === 0) {
+    reviewsContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No reviews yet</p>';
+    return;
+  }
+  
+  const reviewsHtml = reviews.map(review => `
+    <div class="review-item">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <strong>${review.buyerId?.username || 'Anonymous'}</strong>
+          <div class="rating-stars-display">
+            ${generateStarHtml(review.rating)}
+          </div>
+        </div>
+        <span class="review-date">${new Date(review.createdAt).toLocaleDateString()}</span>
+      </div>
+      <h5 class="review-experience">Experience: ${review.experience ? review.experience.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Not specified'}</h5>
+      <p class="review-comment">${review.comment}</p>
+      <div class="review-product">
+        <small>Product: ${review.productId?.name || 'Unknown Product'}</small>
+      </div>
+    </div>
+  `).join('');
+  
+  reviewsContainer.innerHTML = reviewsHtml;
+}
+
+function showOrders() {
+  // Redirect to order management or show orders
+  window.location.href = '/orderTable';
+}
+
+
 // Load products initially
 loadProducts();
+loadSellerStats();
