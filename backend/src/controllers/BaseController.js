@@ -1,3 +1,6 @@
+const { AppError } = require('../utils/ErrorHandler');
+const Logger = require('../utils/Logger');
+
 /**
  * Base Controller Class
  * Provides common functionality for all controller classes
@@ -5,6 +8,7 @@
 class BaseController {
   constructor() {
     this.name = this.constructor.name;
+    this.logger = Logger;
   }
 
   /**
@@ -31,7 +35,11 @@ class BaseController {
    * @param {*} error - Additional error details
    */
   sendError(res, message = 'Internal Server Error', statusCode = 500, error = null) {
-    console.error(`[${this.name}] Error:`, message, error);
+    this.logger.error(`[${this.name}] Error: ${message}`, error, {
+      controller: this.name,
+      statusCode,
+      message
+    });
     
     const response = {
       success: false,
@@ -100,11 +108,27 @@ class BaseController {
       const result = await servicePromise;
       
       if (result && result.success === false) {
+        this.logger.warn('Service returned error', {
+          controller: this.name,
+          message: result.message,
+          statusCode: 400
+        });
         return this.sendError(res, result.message || 'Service error', 400);
       }
       
+      this.logger.info('Service operation successful', {
+        controller: this.name,
+        message: successMessage,
+        statusCode: successStatusCode
+      });
+      
       return this.sendSuccess(res, result, successMessage, successStatusCode);
     } catch (error) {
+      this.logger.error('Service operation failed', error, {
+        controller: this.name,
+        operation: 'handleServiceResponse'
+      });
+
       // Handle specific error types
       if (error.message.includes('not found')) {
         return this.sendError(res, error.message, 404);
@@ -126,7 +150,10 @@ class BaseController {
    * @param {string} context - Context where error occurred
    */
   handleError(error, context) {
-    console.error(`[${this.name}] Error in ${context}:`, error);
+    this.logger.error(`Error in ${context}`, error, {
+      controller: this.name,
+      context
+    });
     throw error;
   }
 
@@ -136,7 +163,11 @@ class BaseController {
    * @param {*} data - Data to log
    */
   log(method, data) {
-    console.log(`[${this.name}] ${method}`, data);
+    this.logger.info(`${method}`, {
+      controller: this.name,
+      method,
+      ...data
+    });
   }
 }
 

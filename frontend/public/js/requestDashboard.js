@@ -179,11 +179,57 @@ function showInfo() {
     }
 }
 
+// ------------------ Debug Session ------------------ //
+async function debugSession() {
+    try {
+        const response = await fetch('/auth/session', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const sessionData = await response.json();
+        console.log('Current session:', sessionData);
+        return sessionData;
+    } catch (error) {
+        console.error('Failed to get session:', error);
+        return null;
+    }
+}
+
+// ------------------ Test Endpoint ------------------ //
+async function testRequestEndpoint(requestId) {
+    try {
+        console.log('Testing request endpoint for ID:', requestId);
+        const response = await fetch(`/requests/${requestId}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        console.log('Request endpoint test response:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            console.log('Request endpoint error:', error);
+        }
+        return response;
+    } catch (error) {
+        console.error('Request endpoint test failed:', error);
+        return null;
+    }
+}
+
 // ------------------ Update Request Status ------------------ //
 async function updateRequestStatus(requestId, newStatus) {
     if (confirm(`Are you sure you want to ${newStatus} this request?`)) {
         try {
             console.log('Updating request status:', { requestId, newStatus });
+            
+            // Debug session before making request
+            await debugSession();
+            
+            // Test if the request exists
+            await testRequestEndpoint(requestId);
             
             const response = await fetch(`/requests/${requestId}/status`, {
                 method: 'PUT',
@@ -194,8 +240,12 @@ async function updateRequestStatus(requestId, newStatus) {
                 body: JSON.stringify({ status: newStatus })
             });
             
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
+            console.log('Response received:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                url: response.url
+            });
 
             if (response.ok) {
                 // Update local data
@@ -208,11 +258,21 @@ async function updateRequestStatus(requestId, newStatus) {
             } else {
                 const error = await response.json();
                 console.error('Error response:', error);
-                alert(`Failed to update request: ${error.message || error.error || 'Unknown error'}`);
+                console.error('Error details:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    errorObject: error
+                });
+                alert(`Failed to update request: ${error.message || 'Unknown error'}`);
             }
         } catch (error) {
             console.error("Error updating request status:", error);
-            alert("Something went wrong. Please try again.");
+            console.error("Error details:", {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
+            alert(`Something went wrong: ${error.message || 'Please try again.'}`);
         }
     }
 }
@@ -410,9 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRequests();
 });
 
-// Auto-refresh every 30 seconds
+// Auto-refresh every 60 seconds (increased from 30 seconds)
 setInterval(() => {
     if (document.visibilityState === 'visible') {
         fetchRequests();
     }
-}, 30000);
+}, 60000);

@@ -148,6 +148,13 @@
     padding: 12px 16px;
     background: white;
     border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.search-container.search-focused {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-box {
@@ -158,11 +165,23 @@
     align-items: center;
     padding: 8px 16px;
     border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    background: white;
+    border-color: #0b660e;
+    box-shadow: 0 0 0 2px rgba(11, 102, 14, 0.2);
 }
 
 .search-box i {
     color: #666;
     margin-right: 8px;
+    transition: color 0.3s ease;
+}
+
+.search-box:focus-within i {
+    color: #0b660e;
 }
 
 .search-box input {
@@ -172,10 +191,56 @@
     outline: none;
     flex: 1;
     font-size: 14px;
+    padding-right: 30px;
 }
 
 .search-box input::placeholder {
     color: #999;
+}
+
+/* Clear Search Button */
+.clear-search-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: none;
+    z-index: 10;
+}
+
+.clear-search-btn:hover {
+    color: #666;
+    background: #f5f5f5;
+}
+
+.clear-search-btn i {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Search Results Indicator */
+.search-results-info {
+    padding: 8px 15px;
+    background: #e3f2fd;
+    border-bottom: 1px solid #bbdefb;
+    font-size: 13px;
+    color: #1976d2;
+    display: none;
+}
+
+.search-results-info.show {
+    display: block;
+}
+
+.search-results-info i {
+    margin-right: 5px;
 }
 
 .conversations-container {
@@ -342,7 +407,7 @@
 }
 
 .delete-conversation-btn:hover {
-    background: #9f0e0e;
+    background: #d5d5d5;
     transform: scale(1.05);
 }
 
@@ -410,21 +475,21 @@
 }
 
 .message-meta {
-    margin-top: 4px;
+    margin-top: 6px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
 }
 
 .message-time {
-    font-size: 11px;
-    color: #666;
+    font-size: 9px;
+    color: #d4d0d0;
     text-align: left;
 }
 
 .message-sender {
     font-size: 10px;
-    color: #888;
+    color: #d4d0d0;
     font-weight: 500;
     text-align: left;
 }

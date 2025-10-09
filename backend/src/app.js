@@ -4,6 +4,10 @@ const path = require("path");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const exphbs = require("express-handlebars");
+const { securityConfig, additionalSecurity, sanitizeRequest } = require("./middleware/security");
+const { ErrorHandler } = require("./utils/ErrorHandler");
+const Logger = require("./utils/Logger");
+const requestLogger = require("./middleware/requestLogger");
 
 // Import routes
 const { router: authRoutes, ensureBuyer } = require("./routes/authRoutes");
@@ -16,23 +20,50 @@ const messageRoutes = require("./routes/messageRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const receiptRoutes = require("./routes/receiptRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const healthRoutes = require("./routes/healthRoutes");
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 
+// Initialize error handling
+ErrorHandler.init();
+
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/ZamHarvestDB")
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .then(() => {
+    Logger.info("MongoDB connected successfully", {
+      uri: process.env.MONGODB_URI ? "configured" : "default"
+    });
+  })
+  .catch(err => {
+    Logger.error("MongoDB connection failed", err, {
+      uri: process.env.MONGODB_URI || "mongodb://localhost:27017/ZamHarvestDB"
+    });
+  });
+
+// Request logging middleware
+app.use(requestLogger);
+
+// Security middleware
+app.use(securityConfig);
+app.use(additionalSecurity);
+app.use(sanitizeRequest);
+
+// Rate limiting removed - was causing module not found errors
 
 // Session middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || "yourStrongSecretHere",
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 86400000 } // 1 day
+  cookie: { 
+    maxAge: 86400000, // 1 day
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'strict'
+  }
 }));
 
 // View engine setup
@@ -88,11 +119,16 @@ app.use("/", paymentRoutes);
 app.use("/", messageRoutes); // Legacy message routes
 app.use("/requests", requestRoutes);
 
+// Health check routes (no rate limiting)
+app.use("/api/health", healthRoutes);
+
 // API Routes (mounted at /api)
 app.use("/api", notificationRoutes);
 app.use("/api", messageRoutes); // API message routes
 app.use("/api", reviewRoutes);
 app.use("/api", receiptRoutes);
+
+// Rate limiting removed - was causing module not found errors
 
 // Debug: Log all registered routes
 console.log('Registered API routes:');
@@ -104,6 +140,16 @@ reviewRoutes.stack.forEach((route) => {
 });
 
 // 404 handler
-app.use((req, res) => res.status(404).send("Page not found"));
+app.use((req, res) => {
+  Logger.warn("404 - Page not found", {
+    url: req.originalUrl,
+    method: req.method,
+    ip: req.ip
+  });
+  res.status(404).send("Page not found");
+});
+
+// Global error handler (must be last)
+app.use(ErrorHandler.handle.bind(ErrorHandler));
 
 module.exports = app;

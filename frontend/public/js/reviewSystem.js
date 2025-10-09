@@ -7,8 +7,23 @@ class ReviewSystem {
 
   // Initialize review system
   init() {
+    this.debugAuthState();
     this.loadReviewableOrders();
     this.setupEventListeners();
+  }
+
+  // Debug authentication state
+  debugAuthState() {
+    console.log('=== Review System Auth Debug ===');
+    console.log('localStorage user:', localStorage.getItem('user'));
+    console.log('localStorage userId:', localStorage.getItem('userId'));
+    console.log('localStorage buyerId:', localStorage.getItem('buyerId'));
+    console.log('sessionStorage userId:', sessionStorage.getItem('userId'));
+    console.log('sessionStorage buyerId:', sessionStorage.getItem('buyerId'));
+    console.log('window.currentUser:', window.currentUser);
+    console.log('window.authManager:', window.authManager);
+    console.log('getBuyerId result:', this.getBuyerId());
+    console.log('================================');
   }
 
   // Load orders that can be reviewed
@@ -111,6 +126,18 @@ class ReviewSystem {
       }
     });
 
+    // Character counter for textarea
+    const commentTextarea = document.getElementById('reviewComment');
+    if (commentTextarea) {
+      commentTextarea.addEventListener('input', (e) => {
+        const charCount = e.target.value.length;
+        const charCountElement = document.querySelector('.char-count');
+        if (charCountElement) {
+          charCountElement.textContent = `${charCount}/500 characters`;
+        }
+      });
+    }
+
     // Star hover effect
     document.addEventListener('mouseover', (e) => {
       if (e.target.classList.contains('star')) {
@@ -172,18 +199,72 @@ class ReviewSystem {
       return;
     }
 
+    // Debug logging for review context
+    console.log('Review submission context:', {
+      currentOrderId: this.currentOrderId,
+      currentProductId: this.currentProductId,
+      currentSellerId: this.currentSellerId
+    });
+
     try {
+      // Determine if this is an order review or product review
+      // Priority: If we have an orderId, it's an order review (even if productId is also set)
+      // If we only have productId, it's a product review
+      const isOrderReview = !!this.currentOrderId;
+      const isProductReview = !this.currentOrderId && !!this.currentProductId;
+
+      // Get buyer ID from session or localStorage
+      let buyerId = this.getBuyerId();
+      
+      // If not found in localStorage, try to get from session API
+      if (!buyerId) {
+        console.log('Buyer ID not found in localStorage, trying session API...');
+        buyerId = await this.getBuyerIdFromSession();
+      }
+      
+      if (!buyerId) {
+        alert('Please log in to submit a review');
+        console.error('No buyer ID found in localStorage or session');
+        return;
+      }
+
+      let requestBody = {
+        rating,
+        comment,
+        experience,
+        buyerId
+      };
+
+      if (isOrderReview) {
+        requestBody.orderId = this.currentOrderId;
+        // Also include productId and sellerId for order reviews
+        if (this.currentProductId) {
+          requestBody.productId = this.currentProductId;
+        }
+        if (this.currentSellerId) {
+          requestBody.sellerId = this.currentSellerId;
+        }
+      } else if (isProductReview) {
+        // For product reviews, we need to find an order for this product
+        // This is a simplified approach - in reality you'd need to check if user has a delivered order
+        requestBody.productId = this.currentProductId;
+        requestBody.sellerId = this.currentSellerId;
+      } else {
+        alert('Unable to determine review type. Please ensure you are reviewing from a valid page.');
+        console.error('Review context:', {
+          currentOrderId: this.currentOrderId,
+          currentProductId: this.currentProductId,
+          currentSellerId: this.currentSellerId
+        });
+        return;
+      }
+
       const response = await fetch('/api/submit-review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          orderId: this.currentOrderId,
-          rating,
-          comment,
-          experience
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();
@@ -191,7 +272,17 @@ class ReviewSystem {
       if (response.ok) {
         alert('Review submitted successfully!');
         this.closeReviewForm();
-        this.loadReviewableOrders(); // Refresh the list
+        
+        // Refresh appropriate content based on review type
+        if (isOrderReview) {
+          this.loadReviewableOrders(); // Refresh the list
+        }
+        if (isProductReview) {
+          // Refresh product reviews if on product detail page
+          if (typeof loadProductReviews === 'function') {
+            loadProductReviews(this.currentProductId);
+          }
+        }
         this.loadSellerReviews(); // Refresh seller reviews if on seller page
       } else {
         alert(data.error || 'Failed to submit review');
@@ -208,13 +299,19 @@ class ReviewSystem {
 
     try {
       const response = await fetch(`/api/reviews/seller/${sellerId}`);
-      const data = await response.json();
-
-      if (data.reviews) {
-        this.displaySellerReviews(data.reviews);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.reviews) {
+          this.displaySellerReviews(data.reviews);
+        }
+      } else {
+        console.warn('Failed to load seller reviews:', response.status, response.statusText);
+        this.displaySellerReviews([]);
       }
     } catch (error) {
       console.error('Error loading seller reviews:', error);
+      this.displaySellerReviews([]);
     }
   }
 
@@ -266,6 +363,63 @@ class ReviewSystem {
     if (reviewSection) {
       reviewSection.style.display = 'none';
     }
+  }
+
+  // Get buyer ID from session or localStorage
+  getBuyerId() {
+    // Try to get from sessionStorage first
+    let buyerId = sessionStorage.getItem('userId') || sessionStorage.getItem('buyerId');
+    
+    // If not found, try localStorage
+    if (!buyerId) {
+      buyerId = localStorage.getItem('userId') || localStorage.getItem('buyerId');
+    }
+    
+    // If still not found, try to get from the user object in localStorage
+    if (!buyerId) {
+      try {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          buyerId = user.id || user._id;
+          console.log('Found user ID from localStorage user object:', buyerId);
+        }
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+    
+    // If still not found, try to get from a global variable
+    if (!buyerId && window.currentUser) {
+      buyerId = window.currentUser.id || window.currentUser._id;
+    }
+    
+    // If still not found, try to get from AuthManager if available
+    if (!buyerId && window.authManager && window.authManager.user) {
+      buyerId = window.authManager.user.id || window.authManager.user._id;
+    }
+    
+    console.log('getBuyerId result:', buyerId);
+    return buyerId;
+  }
+
+  // Alternative method to get buyer ID from session API
+  async getBuyerIdFromSession() {
+    try {
+      const response = await fetch('/api/auth/check', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const sessionData = await response.json();
+        console.log('Session data from API:', sessionData);
+        return sessionData.data?.user?.id || sessionData.user?.id;
+      }
+    } catch (error) {
+      console.error('Error fetching session data:', error);
+    }
+    return null;
   }
 }
 

@@ -103,18 +103,35 @@ class PaymentService extends BaseService {
       // Send notifications based on payment status
       const NotificationService = require("./NotificationService");
       if (updatedStatus === 'Paid') {
+        // Notify buyer
         await NotificationService.createNotification(
           order.buyerId,
-          'Buyer',
+          'buyer',
           'payment_success',
           'Payment Successful',
           `Your payment for order ${order.orderId} has been processed successfully.`,
           { orderId: order.orderId, transactionId: transaction_id, amount: order.totalPrice }
         );
+
+        // Notify seller about payment received
+        await NotificationService.createNotification(
+          order.sellerId,
+          'seller',
+          'payment_received',
+          'Payment Received',
+          `You have received payment for order ${order.orderId} from ${order.username}. Amount: K${order.totalPrice}`,
+          { 
+            orderId: order.orderId, 
+            transactionId: transaction_id, 
+            amount: order.totalPrice,
+            buyerName: order.username,
+            productName: order.productName
+          }
+        );
       } else if (updatedStatus === 'Rejected') {
         await NotificationService.createNotification(
           order.buyerId,
-          'Buyer',
+          'buyer',
           'payment_failed',
           'Payment Failed',
           `Your payment for order ${order.orderId} has failed. ${message}`,

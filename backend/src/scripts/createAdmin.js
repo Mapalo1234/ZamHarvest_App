@@ -45,7 +45,7 @@ async function createAdmin() {
     console.log("⚠️  Please change the password after first login!");
     
   } catch (error) {
-    console.error("❌ Error creating admin user:", error);
+    console.error(" Error creating admin user:", error);
   } finally {
     await mongoose.disconnect();
     console.log("Disconnected from MongoDB");

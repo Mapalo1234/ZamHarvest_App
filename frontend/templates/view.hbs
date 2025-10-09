@@ -6,22 +6,40 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/nav.css">
   <link rel="stylesheet" href="css/view.css">
+  <link rel="stylesheet" href="css/reviewSystem.css">
   <link rel="stylesheet" href="all/css/font-awesome.min.css">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/search.css">
 </head>
 <body>
-  <header id="navbar">
-    <nav>
-      <a class="logo" href="/home">ZamHarvest</a>
-      <ul class="menu">
-        <li><a href="/home">Home</a></li>
-        <li><a href="/frontend/templates/view.hbs">Dashboard</a></li>
-        <li><a href="/request">Requests</a></li>
-      </ul>
-    </nav>
-    <div class="login"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
-  </header>
+    <header id="navbar">
+        <nav>
+          <a class="logo" href="/home">ZamHarvest</a>
+            <ul class="menu">
+              <li>
+                <a>Marketplace</a>
+                <ul class="submenu">
+                  <li><a href="/listproduct">Buyer</a></li>
+                  <li><a href="/view" >Seller</a></li>
+                </ul>
+              </li>
+              <li><a href="/messaging" >Messages</a></li>
+              <li><a href="#" >About</a></li>
+              <li><a href="#" >Resources</a></li>
+            </ul>
+          </nav>
+          <div class="login">
+             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
+               <div class="login-dropdown" id="loginDropdown">
+                <!-- Content will be populated by JavaScript based on login status -->
+             </div>
+          </div>
+          <div class="notfication-logo">
+            <i class="fa fa-bell" aria-hidden="true"></i>
+            <span class="badge hidden">0</span>
+          </div>
+
+    </header>
 
   <section class="top-banner">
     <h2>Access to a Vast <span> Supplier</span> Network</h2>
@@ -75,8 +93,8 @@
       <button class="action-btn" onclick="showReviews()">
         <i class="fa fa-star"></i> View Reviews
       </button>
-      <button class="action-btn" onclick="showOrders()">
-        <i class="fa fa-shopping-cart"></i> Manage Orders
+      <button class="action-btn" onclick="showRequests()">
+        <i class="fa fa-shopping-cart"></i> Requests
       </button>
     </div>
   </div>
@@ -106,9 +124,57 @@
       <i class="fa fa-plus" aria-hidden="true"></i> Add New Product
     </a>
   </div>
+  <!-- Review Modal -->
+  <div id="reviewModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Write a Review</h3>
+        <span class="close" onclick="reviewSystem.closeReviewForm()">&times;</span>
+      </div>
+      <form id="reviewForm" class="review-form">
+        <div class="form-group">
+          <label for="reviewRating">Rating *</label>
+          <div class="star-rating">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" name="rating" value="5" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewExperience">Experience *</label>
+          <select id="reviewExperience" name="experience" required>
+            <option value="">Select your experience</option>
+            <option value="poor">Poor</option>
+            <option value="average">Average</option>
+            <option value="good">Good</option>
+            <option value="very-good">Very Good</option>
+            <option value="excellent">Excellent</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewComment">Comment *</label>
+          <textarea id="reviewComment" name="comment" rows="4" maxlength="500" placeholder="Share your experience with this product..." required></textarea>
+          <small class="char-count">0/500 characters</small>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="reviewSystem.closeReviewForm()">Cancel</button>
+          <button type="submit" class="btn-submit">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <span class="loader"></span>
   <script src="js/search.js"></script>
   <script src="/js/view.js"></script>
+  <script src="/js/reviewSystem.js"></script>
+  <script src="js/navigation.js"></script>
   <script>
 </body>
 </html>

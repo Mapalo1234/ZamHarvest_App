@@ -74,8 +74,9 @@ class RequestService extends BaseService {
       await request.save();
 
       // Update the corresponding order's status based on request status
+      let order = null;
       if (request.order && request.order._id) {
-        const order = await Order.findById(request.order._id);
+        order = await Order.findById(request.order._id);
         if (order) {
         // Update request status in order
         order.requestStatus = status;
@@ -101,16 +102,32 @@ class RequestService extends BaseService {
       if (status === 'accepted') {
         await NotificationService.createNotification(
           request.buyer,
-          'Buyer',
+          'buyer',
           'request_accepted',
           'Request Accepted',
           `Your request has been accepted by the seller. You can now proceed with payment.`,
           { requestId: requestId, orderId: order?._id }
         );
+
+        // Add delivery scheduled notification
+        if (order) {
+          await NotificationService.createNotification(
+            request.buyer,
+            'buyer',
+            'delivery_scheduled',
+            'Delivery Scheduled',
+            `Your order ${order.orderId} is scheduled for delivery on ${new Date(order.deliveryDate).toLocaleDateString()}.`,
+            { 
+              orderId: order.orderId, 
+              deliveryDate: order.deliveryDate,
+              productName: order.productName
+            }
+          );
+        }
       } else if (status === 'rejected') {
         await NotificationService.createNotification(
           request.buyer,
-          'Buyer',
+          'buyer',
           'request_rejected',
           'Request Rejected',
           `Your request has been rejected by the seller.`,
@@ -121,7 +138,7 @@ class RequestService extends BaseService {
       // Send confirmation notification to seller
       await NotificationService.createNotification(
         sellerId,
-        'Seller',
+        'seller',
         'request_updated',
         'Request Updated',
         `You have ${status} a request from ${request.buyer?.username || 'a buyer'}.`,

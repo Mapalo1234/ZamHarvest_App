@@ -5,7 +5,7 @@
 class AutoRefreshSystem {
     constructor() {
         this.isEnabled = true;
-        this.refreshInterval = 3000; // 3 seconds
+        this.refreshInterval = 10000; // 10 seconds (increased from 3 seconds)
         this.intervalId = null;
         this.lastRefresh = Date.now();
         

@@ -472,9 +472,9 @@ class MessagingSystem {
             }
             console.log('All conversations:', conversations);
 
-            // Check if there's already a conversation for this product
+            // Check if there's already a conversation for this product and seller
             const existingConversation = conversations.find(conv => 
-                conv._id.productId === productId
+                conv.product && conv.product._id === productId && conv.sellerId && conv.sellerId._id === sellerId
             );
 
             if (existingConversation) {

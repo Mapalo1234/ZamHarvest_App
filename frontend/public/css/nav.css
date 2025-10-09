@@ -76,6 +76,7 @@ nav .logo {
 .menu > li:hover > a::before {
   visibility: visible;
   scale: 1 1;
+  opacity: 0.7;
 }
 
 .submenu {
@@ -85,8 +86,9 @@ nav .logo {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  width: 100%;
-  background-color: #1f4d4f;
+    border-radius: 5px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
   height: 0;
   line-height: 40px;
   box-sizing: border-box;
@@ -117,20 +119,41 @@ nav .logo {
   text-decoration: none;
   position: relative;
   height: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
 .menu > li > a::before {
   content: "";
   position: absolute;
-  width: 100%;
+  width: 60px; /* Smaller width */
   height: 3px;
   bottom: 20px;
-  left: 0px;
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Perfect centering */
   background-color: rgb(255, 165, 0);
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   scale: 0 0;
   visibility: hidden;
+  opacity: 0;
+}
+
+/* Navigation underline animation - removed green underline */
+
+.menu {
+  position: relative;
+}
+
+/* Active tab styling */
+.menu > li > a.active {
+  color: rgb(48, 101, 62);
+  font-weight: 600;
+}
+
+.menu > li > a.active::before {
+  visibility: visible;
+  scale: 1 1;
+  opacity: 1;
 }
 
 .bottom-banner {

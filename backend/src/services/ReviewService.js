@@ -22,71 +22,188 @@ class ReviewService extends BaseService {
     try {
       this.log('submitReview', reviewData);
 
+      const { orderId, productId, sellerId, rating, comment, experience, title, buyerId } = reviewData;
+
+      // Validate required fields based on review type
+      if (orderId) {
+        this.validateRequired(reviewData, ['orderId', 'rating', 'comment', 'experience', 'buyerId']);
+        return await this.submitOrderReview(reviewData);
+      } else if (productId && sellerId) {
+        this.validateRequired(reviewData, ['productId', 'sellerId', 'rating', 'comment', 'experience', 'buyerId']);
+        return await this.submitProductReview(reviewData);
+      } else {
+        throw new Error("Either orderId or (productId and sellerId) must be provided");
+      }
+
+    } catch (error) {
+      console.error('Error in submitReview service:', error);
+      console.error('Review data:', reviewData);
+      this.handleError(error, 'submitReview');
+    }
+  }
+
+  /**
+   * Submit an order review
+   * @param {Object} reviewData - Review data
+   * @returns {Object} Created review
+   */
+  async submitOrderReview(reviewData) {
+    try {
       const { orderId, rating, comment, experience, title, buyerId } = reviewData;
 
-      this.validateRequired(reviewData, ['orderId', 'rating', 'comment', 'experience', 'buyerId']);
+      console.log('submitOrderReview called with:', { orderId, rating, comment, experience, title, buyerId });
 
       // Validate rating
       if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
       }
 
-      // Find and validate order
-      const order = await Order.findById(orderId)
-        .populate('productId')
-        .populate('sellerId');
+    // Find and validate order
+    const order = await Order.findById(orderId)
+      .populate('productId')
+      .populate('sellerId');
 
-      if (!order) {
-        throw new Error("Order not found");
-      }
+    if (!order) {
+      throw new Error("Order not found");
+    }
 
-      // Check if buyer owns this order
-      if (order.buyerId.toString() !== buyerId) {
-        throw new Error("You can only review your own orders");
-      }
+    // Check if buyer owns this order
+    if (order.buyerId.toString() !== buyerId) {
+      throw new Error("You can only review your own orders");
+    }
 
-      // Check if order is delivered and paid
-      if (order.deliveryStatus !== 'Delivered' || order.paidStatus !== 'Paid') {
-        throw new Error("You can only review delivered and paid orders");
-      }
+    // Check if order is delivered and paid
+    if (order.deliveryStatus !== 'Delivered' || order.paidStatus !== 'Paid') {
+      throw new Error("You can only review delivered and paid orders");
+    }
 
-      // Check if review already exists
-      const existingReview = await Review.findOne({
-        buyerId,
-        orderId
-      });
+    // Check if review already exists
+    const existingReview = await Review.findOne({
+      buyerId,
+      orderId
+    });
 
-      if (existingReview) {
-        throw new Error("You have already reviewed this order");
-      }
+    if (existingReview) {
+      throw new Error("You have already reviewed this order");
+    }
 
-      // Create review
-      const review = new Review({
-        buyerId,
-        sellerId: order.sellerId._id,
-        orderId,
-        productId: order.productId._id,
-        rating,
-        comment,
-        experience,
-        title: title || '',
-        isVerified: true
-      });
+    // Create review
+    const review = new Review({
+      buyerId,
+      sellerId: order.sellerId._id,
+      orderId,
+      productId: order.productId._id,
+      rating,
+      comment,
+      experience,
+      title: title || '',
+      isVerified: true
+    });
 
-      await review.save();
+    await review.save();
 
-      // Update seller's average rating
-      await this.updateSellerRating(order.sellerId._id);
+    // Update seller's average rating
+    await this.updateSellerRating(order.sellerId._id);
 
-      // Mark order as reviewed
-      order.canReview = false;
-      await order.save();
+    // Mark order as reviewed
+    order.canReview = false;
+    await order.save();
 
-      this.log('submitReview completed', { reviewId: review._id });
-      return review;
-
+    this.log('submitOrderReview completed', { reviewId: review._id });
+    return review;
     } catch (error) {
-      this.handleError(error, 'submitReview');
+      console.error('Error in submitOrderReview:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Submit a product review (simplified - for demonstration)
+   * @param {Object} reviewData - Review data
+   * @returns {Object} Created review
+   */
+  async submitProductReview(reviewData) {
+    try {
+      const { productId, sellerId, rating, comment, experience, title, buyerId } = reviewData;
+
+      console.log('submitProductReview called with:', { productId, sellerId, rating, comment, experience, title, buyerId });
+
+      // Validate rating
+      if (rating < 1 || rating > 5) {
+        throw new Error("Rating must be between 1 and 5");
+      }
+
+    // Check if review already exists for this product by this buyer
+    const existingReview = await Review.findOne({
+      buyerId,
+      productId
+    });
+
+    if (existingReview) {
+      throw new Error("You have already reviewed this product");
+    }
+
+    // Create review (without orderId for product reviews)
+    const review = new Review({
+      buyerId,
+      sellerId,
+      productId,
+      rating,
+      comment,
+      experience,
+      title: title || '',
+      isVerified: true
+    });
+
+    await review.save();
+
+    // Update seller's average rating
+    await this.updateSellerRating(sellerId);
+
+    // Send notifications
+    const NotificationService = require("./NotificationService");
+    
+    // Get product and seller details for notifications
+    const product = await Product.findById(productId).select('name');
+    const seller = await Seller.findById(sellerId).select('username');
+    const buyer = await require("../models/buyer").findById(buyerId).select('username');
+
+    // Notify seller about new review
+    await NotificationService.createNotification(
+      sellerId,
+      'seller',
+      'seller_rated',
+      'New Review Received',
+      `You received a ${rating}-star review from ${buyer?.username || 'a buyer'} for "${product?.name || 'your product'}".`,
+      {
+        reviewId: review._id,
+        productId: productId,
+        rating: rating,
+        buyerName: buyer?.username,
+        productName: product?.name
+      }
+    );
+
+    // Notify buyer about review submission
+    await NotificationService.createNotification(
+      buyerId,
+      'buyer',
+      'review_submitted',
+      'Review Submitted',
+      `Thank you! Your ${rating}-star review for "${product?.name || 'the product'}" has been submitted successfully.`,
+      {
+        reviewId: review._id,
+        productId: productId,
+        rating: rating,
+        productName: product?.name
+      }
+    );
+
+    this.log('submitProductReview completed', { reviewId: review._id });
+    return review;
+    } catch (error) {
+      console.error('Error in submitProductReview:', error);
+      throw error;
     }
   }
 
@@ -98,6 +215,7 @@ class ReviewService extends BaseService {
    */
   async getSellerReviews(sellerId, options = {}) {
     try {
+      console.log('ReviewService.getSellerReviews called with:', { sellerId, options });
       this.log('getSellerReviews', { sellerId, options });
 
       const { page = 1, limit = 10, sortBy = 'newest' } = options;
@@ -129,6 +247,9 @@ class ReviewService extends BaseService {
           .lean(),
         Review.countDocuments({ sellerId, isVisible: true })
       ]);
+
+      console.log('Found reviews:', { count: reviews.length, total, sellerId });
+      console.log('Reviews data:', reviews);
 
       const result = {
         reviews,
@@ -461,6 +582,47 @@ class ReviewService extends BaseService {
 
     } catch (error) {
       this.handleError(error, 'getBuyerReviews');
+    }
+  }
+
+  /**
+   * Get reviewable orders for a buyer
+   * @param {string} buyerId - Buyer ID
+   * @returns {Object} Reviewable orders
+   */
+  async getReviewableOrders(buyerId) {
+    try {
+      this.log('getReviewableOrders', { buyerId });
+
+      const orders = await Order.find({
+        buyerId,
+        deliveryStatus: 'Delivered',
+        paidStatus: 'Paid',
+        canReview: true
+      })
+        .populate('productId', 'name image')
+        .populate('sellerId', 'username')
+        .sort({ deliveredAt: -1 })
+        .lean();
+
+      // Filter out orders that already have reviews
+      const reviewableOrders = [];
+      for (const order of orders) {
+        const existingReview = await Review.findOne({
+          buyerId,
+          orderId: order._id
+        });
+        
+        if (!existingReview) {
+          reviewableOrders.push(order);
+        }
+      }
+
+      this.log('getReviewableOrders completed', { count: reviewableOrders.length });
+      return { orders: reviewableOrders };
+
+    } catch (error) {
+      this.handleError(error, 'getReviewableOrders');
     }
   }
 

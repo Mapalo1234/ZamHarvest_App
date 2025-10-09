@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const Seller = require("../models/seller");
 const BaseService = require("./BaseService");
+const { AppError } = require("../utils/ErrorHandler");
 
 /**
  * Product Service
@@ -36,7 +37,7 @@ class ProductService extends BaseService {
           isDummyProduct: { $ne: true }
         }).populate("sellerId", "username averageRating totalReviews totalPoints");
       } else {
-        throw new Error("Invalid user role");
+        throw new AppError("Invalid user role", 400);
       }
 
       this.log('getProducts completed', { count: products.length });
@@ -80,7 +81,7 @@ class ProductService extends BaseService {
       // Get seller information
       const seller = await Seller.findById(sellerId);
       if (!seller) {
-        throw new Error("Seller not found");
+        throw new AppError("Seller not found", 404);
       }
 
       // Prepare product data
@@ -120,6 +121,22 @@ class ProductService extends BaseService {
       // Populate seller information for response
       await product.populate("sellerId", "username averageRating totalReviews totalPoints");
 
+      // Send notification to seller about successful product creation
+      const NotificationService = require("./NotificationService");
+      await NotificationService.createNotification(
+        sellerId,
+        'seller',
+        'product_added',
+        'Product Added Successfully',
+        `Your product "${product.name}" has been added to the marketplace and is now available for buyers.`,
+        {
+          productId: product._id,
+          productName: product.name,
+          category: product.category,
+          price: product.price
+        }
+      );
+
       this.log('createProduct completed', { productId: product._id });
       return product;
     } catch (error) {
@@ -137,14 +154,14 @@ class ProductService extends BaseService {
       this.log('getProductById', { productId });
 
       if (!productId) {
-        throw new Error("Product ID is required");
+        throw new AppError("Product ID is required", 400);
       }
 
       const product = await Product.findById(productId)
         .populate("sellerId", "username averageRating totalReviews totalPoints");
 
       if (!product) {
-        throw new Error("Product not found");
+        throw new AppError("Product not found", 404);
       }
 
       this.log('getProductById completed', { productId: product._id });
@@ -167,12 +184,12 @@ class ProductService extends BaseService {
 
       const product = await Product.findById(productId);
       if (!product) {
-        throw new Error("Product not found");
+        throw new AppError("Product not found", 404);
       }
 
       // Verify ownership
       if (product.sellerId.toString() !== sellerId) {
-        throw new Error("Unauthorized: You can only update your own products");
+        throw new AppError("Unauthorized: You can only update your own products", 403);
       }
 
       // Update product
@@ -201,12 +218,12 @@ class ProductService extends BaseService {
 
       const product = await Product.findById(productId);
       if (!product) {
-        throw new Error("Product not found");
+        throw new AppError("Product not found", 404);
       }
 
       // Verify ownership
       if (product.sellerId.toString() !== sellerId) {
-        throw new Error("Unauthorized: You can only delete your own products");
+        throw new AppError("Unauthorized: You can only delete your own products", 403);
       }
 
       // Soft delete by setting isActive to false

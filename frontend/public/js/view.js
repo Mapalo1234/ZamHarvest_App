@@ -137,37 +137,9 @@ async function deleteProduct(id) {
   }
 }
 
-// Stock update function
 function updateStock(productId, productName, currentStock, currentUnit) {
-  const newStock = prompt(`Update stock for "${productName}"\nCurrent: ${currentStock} ${currentUnit}\nEnter new quantity:`, currentStock);
+  alert("Stock management feature is temporarily disabled. This will be implemented in a future update.");
   
-  if (newStock === null) return; // User cancelled
-  
-  const stockValue = parseInt(newStock);
-  if (isNaN(stockValue) || stockValue < 0) {
-    alert("Please enter a valid positive number.");
-    return;
-  }
-
-  // Update stock via API
-  fetch(`/inventory/${productId}/stock`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ stock: stockValue })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.message) {
-      alert(data.message);
-      loadProducts(searchInput.value.trim(), currentPage); // Refresh the list
-    } else {
-      alert("Error updating stock: " + (data.error || "Unknown error"));
-    }
-  })
-  .catch(error => {
-    console.error("Error updating stock:", error);
-    alert("Failed to update stock.");
-  });
 }
 
 // Seller Dashboard Functions
@@ -191,25 +163,55 @@ async function loadSellerStats() {
     
     // Get seller's reviews
     const sellerId = products[0]?.sellerId?._id || products[0]?.sellerId;
+    console.log('Loading seller reviews for sellerId:', sellerId);
+    console.log('Products data:', products[0]);
+    
     if (sellerId) {
-      const reviewsResponse = await fetch(`/api/reviews/seller/${sellerId}`);
-      const reviewsData = await reviewsResponse.json();
-      
-      if (reviewsData.reviews && reviewsData.reviews.length > 0) {
-        const totalReviews = reviewsData.reviews.length;
-        const averageRating = reviewsData.reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+      try {
+        console.log('Fetching reviews from:', `/api/reviews/seller/${sellerId}`);
+        const reviewsResponse = await fetch(`/api/reviews/seller/${sellerId}`);
         
-        document.getElementById('totalReviews').textContent = totalReviews;
-        document.getElementById('averageRating').textContent = averageRating.toFixed(1);
+        console.log('Reviews response status:', reviewsResponse.status);
+        console.log('Reviews response ok:', reviewsResponse.ok);
         
-        // Display stars
-        const starsContainer = document.getElementById('ratingStars');
-        starsContainer.innerHTML = generateStarHtml(averageRating);
-      } else {
+        if (reviewsResponse.ok) {
+          const reviewsData = await reviewsResponse.json();
+          console.log('Reviews data received:', reviewsData);
+          
+          if (reviewsData.reviews && reviewsData.reviews.length > 0) {
+            const totalReviews = reviewsData.reviews.length;
+            const averageRating = reviewsData.reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+            
+            console.log('Calculated stats:', { totalReviews, averageRating });
+            
+            document.getElementById('totalReviews').textContent = totalReviews;
+            document.getElementById('averageRating').textContent = averageRating.toFixed(1);
+            
+            // Display stars
+            const starsContainer = document.getElementById('ratingStars');
+            starsContainer.innerHTML = generateStarHtml(averageRating);
+          } else {
+            console.log('No reviews found for seller');
+            document.getElementById('totalReviews').textContent = '0';
+            document.getElementById('averageRating').textContent = '0.0';
+            document.getElementById('ratingStars').innerHTML = generateStarHtml(0);
+          }
+        } else {
+          console.warn('Failed to load seller reviews for stats:', reviewsResponse.status);
+          const errorText = await reviewsResponse.text();
+          console.warn('Error response:', errorText);
+          document.getElementById('totalReviews').textContent = '0';
+          document.getElementById('averageRating').textContent = '0.0';
+          document.getElementById('ratingStars').innerHTML = generateStarHtml(0);
+        }
+      } catch (error) {
+        console.error('Error loading seller reviews for stats:', error);
         document.getElementById('totalReviews').textContent = '0';
         document.getElementById('averageRating').textContent = '0.0';
         document.getElementById('ratingStars').innerHTML = generateStarHtml(0);
       }
+    } else {
+      console.warn('No sellerId found in products data');
     }
   } catch (error) {
     console.error('Error loading seller stats:', error);
@@ -260,9 +262,14 @@ async function loadSellerReviews() {
     const sellerId = products[0]?.sellerId?._id || products[0]?.sellerId;
     if (sellerId) {
       const reviewsResponse = await fetch(`/api/reviews/seller/${sellerId}`);
-      const reviewsData = await reviewsResponse.json();
       
-      displaySellerReviews(reviewsData.reviews || []);
+      if (reviewsResponse.ok) {
+        const reviewsData = await reviewsResponse.json();
+        displaySellerReviews(reviewsData.reviews || []);
+      } else {
+        console.warn('Failed to load seller reviews:', reviewsResponse.status, reviewsResponse.statusText);
+        displaySellerReviews([]);
+      }
     }
   } catch (error) {
     console.error('Error loading seller reviews:', error);
@@ -301,7 +308,7 @@ function displaySellerReviews(reviews) {
 
 function showOrders() {
   // Redirect to order management or show orders
-  window.location.href = '/orderTable';
+  window.location.href = '/request';
 }
 
 

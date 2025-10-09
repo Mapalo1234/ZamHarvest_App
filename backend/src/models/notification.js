@@ -14,7 +14,18 @@ const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['order_created', 'order_updated', 'order_cancelled', 'request_received', 'request_accepted', 'request_rejected', 'request_updated', 'payment_received', 'payment_confirmed', 'payment_success', 'payment_failed', 'delivery_scheduled', 'delivery_confirmed', 'seller_rated', 'review_submitted', 'product_available', 'message_received', 'message_sent', 'receipt_available', 'receipt_emailed', 'welcome']
+    enum: [
+      'order_created', 'order_updated', 'order_cancelled', 
+      'request_received', 'request_accepted', 'request_rejected', 'request_updated', 
+      'payment_received', 'payment_confirmed', 'payment_success', 'payment_failed', 
+      'delivery_scheduled', 'delivery_confirmed', 'delivery_completed',
+      'seller_rated', 'review_submitted', 'product_available', 
+      'message_received', 'message_sent', 
+      'receipt_available', 'receipt_emailed', 
+      'welcome', 'user_registered', 'product_added', 'product_updated',
+      'order_delivered', 'order_completed', 'order_cancelled_by_seller',
+      'low_stock', 'product_out_of_stock', 'price_updated'
+    ]
   },
   title: { type: String, required: true },
   message: { type: String, required: true },

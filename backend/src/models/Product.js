@@ -15,7 +15,8 @@ const productSchema = new mongoose.Schema({
   sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "Seller", required: true },
   sellername: { type: String, required: true },
   unit: { type: String, default: "kg" },
-    availability: { 
+  stock: { type: Number, min: 0, default: 0 },
+  availability: { 
     type: String, 
     enum: ["Available", "Unavailable"], 
     default: "Available"

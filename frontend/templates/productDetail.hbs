@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="css/test.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/messaging.css">
+    <link rel="stylesheet" href="css/reviewSystem.css">
     <link rel="stylesheet" href="all/css/font-awesome.min.css">
     <title>Product Details</title>
 </head>
@@ -74,6 +75,9 @@
                     <div class="stars-display"></div>
                     <span class="total-reviews">(0 reviews)</span>
                 </div>
+                <button class="write-review-btn" id="writeReviewBtn" onclick="openReviewModal()" style="display: none;">
+                    <i class="fa fa-star"></i> Write Review
+                </button>
             </div>
         </div>
         
@@ -87,6 +91,52 @@
             <button class="next-reviews" id="nextReviews">Next</button>
         </div>
     </div>
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Write a Review</h3>
+                <span class="close" onclick="reviewSystem.closeReviewForm()">&times;</span>
+            </div>
+            <form id="reviewForm" class="review-form">
+                <div class="form-group">
+                    <label for="reviewRating">Rating *</label>
+                    <div class="star-rating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <input type="hidden" id="reviewRating" name="rating" value="5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reviewExperience">Experience *</label>
+                    <select id="reviewExperience" name="experience" required>
+                        <option value="">Select your experience</option>
+                        <option value="poor">Poor</option>
+                        <option value="average">Average</option>
+                        <option value="good">Good</option>
+                        <option value="very-good">Very Good</option>
+                        <option value="excellent">Excellent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reviewComment">Comment *</label>
+                    <textarea id="reviewComment" name="comment" rows="4" maxlength="500" placeholder="Share your experience with this product..." required></textarea>
+                    <small class="char-count">0/500 characters</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="reviewSystem.closeReviewForm()">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="loader-wrapper">
         <span class="loader"></span>
     </div>
@@ -95,6 +145,8 @@
     <script src="/js/test.js"></script>
     <script src="js/notificationSystem.js"></script>
     <script src="js/authManager.js"></script>
+    <script src="/js/reviewSystem.js"></script>
+    <script src="js/navigation.js"></script>
     <script>
       window.addEventListener("load", () => {
         const loaderWrapper = document.querySelector(".loader-wrapper");
@@ -102,6 +154,59 @@
           loaderWrapper.style.display = "none"; // Hide loader
         }
       });
+
+      // Global variables for review functionality
+      let currentProductId = null;
+      let currentSellerId = null;
+
+      // Function to open review modal
+      function openReviewModal() {
+        if (!currentProductId || !currentSellerId) {
+          alert('Product information not available');
+          return;
+        }
+
+        // Check if user can review this product
+        checkReviewEligibility();
+      }
+
+      // Check if user can review this product
+      async function checkReviewEligibility() {
+        try {
+          // For now, we'll show the modal if user is logged in
+          // In a real implementation, you'd check if they have a delivered order for this product
+          const modal = document.getElementById('reviewModal');
+          if (modal) {
+            modal.style.display = 'block';
+            // Initialize the review system for this product
+            if (window.reviewSystem) {
+              window.reviewSystem.currentProductId = currentProductId;
+              window.reviewSystem.currentSellerId = currentSellerId;
+              window.reviewSystem.resetReviewForm();
+            }
+          }
+        } catch (error) {
+          console.error('Error checking review eligibility:', error);
+          alert('Unable to check review eligibility');
+        }
+      }
+
+      // Function to show/hide write review button based on user authentication
+      function toggleWriteReviewButton() {
+        const writeReviewBtn = document.getElementById('writeReviewBtn');
+        if (writeReviewBtn) {
+          // Check if user is logged in (you can implement proper authentication check)
+          const isLoggedIn = checkUserAuthentication(); // Implement this function
+          writeReviewBtn.style.display = isLoggedIn ? 'block' : 'none';
+        }
+      }
+
+      // Function to check user authentication (implement based on your auth system)
+      function checkUserAuthentication() {
+        // This is a placeholder - implement based on your authentication system
+        // You might check localStorage, sessionStorage, or make an API call
+        return localStorage.getItem('userId') !== null || sessionStorage.getItem('userId') !== null;
+      }
 
       // Message Supplier button functionality will be implemented here
 

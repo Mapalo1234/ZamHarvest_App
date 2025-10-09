@@ -4,7 +4,7 @@ class NotificationSystem {
     this.unreadCount = 0;
     this.isDropdownOpen = false;
     this.pollingInterval = null;
-    this.pollingDelay = 3000; // 3 seconds for auto-refresh
+    this.pollingDelay = 10000; // 10 seconds for auto-refresh (increased from 3 seconds)
     
     this.init();
   }

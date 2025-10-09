@@ -24,6 +24,17 @@ class MessageController extends BaseController {
       return this.sendError(res, 'Only buyers can initiate conversations', 403);
     }
 
+    // Validate required fields
+    const { buyerId, sellerId, productId } = req.body;
+    if (!buyerId || !sellerId || !productId) {
+      return this.sendError(res, 'Missing required fields: buyerId, sellerId, productId', 400);
+    }
+
+    // Ensure buyerId matches the logged-in user
+    if (buyerId !== userId) {
+      return this.sendError(res, 'Buyer ID must match the logged-in user', 400);
+    }
+
     await this.handleServiceResponse(
       res,
       MessageService.createOrGetConversation(req.body, userId),

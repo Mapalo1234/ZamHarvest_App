@@ -114,7 +114,7 @@ function handlePayment(orderId) {
     // Show the payment modal
     const modal = document.getElementById('paymentModal');
     if (modal) {
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
     }
 }
 

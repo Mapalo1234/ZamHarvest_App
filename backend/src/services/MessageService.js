@@ -3,7 +3,7 @@ const Conversation = require("../models/Conversation");
 const Product = require("../models/Product");
 const Buyer = require("../models/buyer");
 const Seller = require("../models/seller");
-const NotificationService = require("../utils/notificationService");
+const NotificationService = require("./NotificationService");
 const BaseService = require("./BaseService");
 
 /**
@@ -48,11 +48,18 @@ class MessageService extends BaseService {
         throw new Error("Seller not found");
       }
 
+      // Verify the buyer exists
+      const buyer = await Buyer.findById(buyerId);
+      if (!buyer) {
+        throw new Error("Buyer not found");
+      }
+
       // Check if conversation exists
       let conversation = await Conversation.findOne({
         buyerId: currentUserId,
         sellerId: sellerId,
-        product: productId
+        product: productId,
+        isActive: { $ne: false }
       }).populate('buyerId', 'username email')
         .populate('sellerId', 'username email')
         .populate('product', 'name price image');
@@ -60,21 +67,41 @@ class MessageService extends BaseService {
       let isNewConversation = false;
 
       if (!conversation) {
-        // Create new conversation
-        conversation = new Conversation({
-          buyerId: currentUserId,
-          sellerId: sellerId,
-          product: productId,
-          lastMessageAt: new Date()
-        });
+        try {
+          // Create new conversation
+          conversation = new Conversation({
+            buyerId: currentUserId,
+            sellerId: sellerId,
+            product: productId,
+            lastMessageAt: new Date(),
+            isActive: true
+          });
 
-        await conversation.save();
-        isNewConversation = true;
+          await conversation.save();
+          isNewConversation = true;
 
-        // Populate the new conversation
-        await conversation.populate('buyerId', 'username email');
-        await conversation.populate('sellerId', 'username email');
-        await conversation.populate('product', 'name price image');
+          // Populate the new conversation
+          await conversation.populate('buyerId', 'username email');
+          await conversation.populate('sellerId', 'username email');
+          await conversation.populate('product', 'name price image');
+        } catch (error) {
+          // Handle duplicate key error (conversation already exists)
+          if (error.code === 11000) {
+            this.log('Conversation already exists, fetching existing one');
+            conversation = await Conversation.findOne({
+              buyerId: currentUserId,
+              sellerId: sellerId,
+              product: productId,
+              isActive: { $ne: false }
+            }).populate('buyerId', 'username email')
+              .populate('sellerId', 'username email')
+              .populate('product', 'name price image');
+            
+            isNewConversation = false;
+          } else {
+            throw error;
+          }
+        }
       }
 
       this.log('createOrGetConversation completed', { 
@@ -166,7 +193,7 @@ class MessageService extends BaseService {
 
       await NotificationService.createNotification(
         receiverId,
-        receiverType === 'buyer' ? 'Buyer' : 'Seller',
+        receiverType,
         'message_received',
         'New Message',
         `You have a new message about ${conversation.product.name}`,

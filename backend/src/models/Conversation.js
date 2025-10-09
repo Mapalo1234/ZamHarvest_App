@@ -50,4 +50,10 @@ conversationSchema.index({ buyerId: 1, lastMessageTime: -1 });
 conversationSchema.index({ sellerId: 1, lastMessageTime: -1 });
 conversationSchema.index({ isActive: 1 });
 
+// Unique compound index to prevent duplicate conversations
+conversationSchema.index(
+  { buyerId: 1, sellerId: 1, product: 1, isActive: 1 }, 
+  { unique: true, partialFilterExpression: { isActive: { $ne: false } } }
+);
+
 module.exports = mongoose.models.Conversation || mongoose.model("Conversation", conversationSchema);

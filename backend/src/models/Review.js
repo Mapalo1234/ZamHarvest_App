@@ -15,7 +15,7 @@ const reviewSchema = new mongoose.Schema({
   orderId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Order", 
-    required: true 
+    required: false 
   },
   productId: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -43,7 +43,7 @@ const reviewSchema = new mongoose.Schema({
   experience: {
     type: String,
     required: true,
-    enum: ['good', 'very-good', 'excellent']
+    enum: ['poor', 'average', 'good', 'very-good', 'excellent']
   },
 
   // Review metadata
@@ -73,9 +73,11 @@ const reviewSchema = new mongoose.Schema({
 
 // Indexes for efficient querying
 reviewSchema.index({ sellerId: 1, createdAt: -1 });
-reviewSchema.index({ buyerId: 1, orderId: 1 }, { unique: true }); // One review per order
+reviewSchema.index({ buyerId: 1, orderId: 1 }, { unique: true, partialFilterExpression: { orderId: { $exists: true, $ne: null } } }); // One review per order (only when orderId exists)
+reviewSchema.index({ buyerId: 1, productId: 1 }, { unique: true, partialFilterExpression: { orderId: { $exists: false } } }); // One review per product (only for product reviews)
 reviewSchema.index({ productId: 1, rating: 1 });
 reviewSchema.index({ isVisible: 1, sellerId: 1 });
+reviewSchema.index({ createdAt: -1 }); // For general sorting
 
 // Update the updatedAt field before saving
 reviewSchema.pre('save', function(next) {

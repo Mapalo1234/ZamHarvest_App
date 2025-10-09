@@ -62,10 +62,10 @@ class OrderService extends BaseService {
         throw new Error("This product is no longer active");
       }
 
-      // Check stock availability
-      if (product.stock < quantity) {
-        throw new Error(`Insufficient stock. Available: ${product.stock} ${product.unit}`);
-      }
+      // Stock check temporarily disabled - to be implemented later
+      // if (product.stock < quantity) {
+      //   throw new Error(`Insufficient stock. Available: ${product.stock} ${product.unit}`);
+      // }
 
       // Get seller information
       const sellerId = product.sellerId;
@@ -113,7 +113,7 @@ class OrderService extends BaseService {
       // Notify buyer that order was created
       await NotificationService.createNotification(
         userId,
-        'Buyer',
+        'buyer',
         'order_created',
         'Order Confirmed',
         `Your order for ${productName} has been confirmed and is being processed.`,
@@ -128,10 +128,10 @@ class OrderService extends BaseService {
       // Notify seller that they received a request
       await NotificationService.createNotification(
         sellerId,
-        'Seller',
+        'seller',
         'request_received',
         'New Order Request',
-        `You have received a new order request for ${productName}.`,
+        `You have received a new order request for ${productName} from ${userName}.`,
         {
           orderId: order.orderId,
           requestId: request._id,
@@ -521,7 +521,7 @@ class OrderService extends BaseService {
       // Notify seller that delivery was confirmed
       await NotificationService.createNotification(
         order.sellerId,
-        'Seller',
+        'seller',
         'delivery_confirmed',
         'Delivery Confirmed!',
         `Your delivery for "${order.productName}" has been confirmed by the buyer.`,
@@ -533,10 +533,25 @@ class OrderService extends BaseService {
         }
       );
 
+      // Notify buyer that delivery is completed
+      await NotificationService.createNotification(
+        order.buyerId,
+        'buyer',
+        'delivery_completed',
+        'Delivery Completed!',
+        `Your order "${order.productName}" has been successfully delivered. Thank you for your purchase!`,
+        {
+          orderId: order.orderId,
+          productName: order.productName,
+          sellerName: order.sellerName,
+          amount: order.totalPrice
+        }
+      );
+
       // Notify buyer that they can now review
       await NotificationService.createNotification(
         order.buyerId,
-        'Buyer',
+        'buyer',
         'delivery_confirmed',
         'Delivery Confirmed!',
         `Your order "${order.productName}" has been marked as delivered. You can now rate the seller!`,

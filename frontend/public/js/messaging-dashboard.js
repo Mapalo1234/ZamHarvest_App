@@ -114,6 +114,33 @@ class MessagingDashboard {
             });
         }
 
+        // Search input events
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.handleConversationSearch(e.target.value);
+                this.toggleSearchClearButton(e.target.value);
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.handleConversationSearch(e.target.value);
+                }
+            });
+
+            // Add clear search functionality
+            searchInput.addEventListener('focus', () => {
+                this.showSearchSuggestions();
+            });
+
+            searchInput.addEventListener('blur', () => {
+                setTimeout(() => {
+                    this.hideSearchSuggestions();
+                }, 200);
+            });
+        }
+
         // Close messaging button
         const closeMessagingBtn = document.getElementById('closeMessagingBtn');
         if (closeMessagingBtn) {
@@ -632,9 +659,132 @@ class MessagingDashboard {
         }, 3000);
     }
 
+    // Conversation Search Functionality
+    handleConversationSearch(query) {
+        if (this.conversationSearchTimeout) {
+            clearTimeout(this.conversationSearchTimeout);
+        }
+
+        if (query.length < 1) {
+            this.displayConversations(this.conversations);
+            // Hide search results info when search is cleared
+            const resultsInfo = document.querySelector('.search-results-info');
+            if (resultsInfo) {
+                resultsInfo.classList.remove('show');
+            }
+            return;
+        }
+
+        this.conversationSearchTimeout = setTimeout(() => {
+            this.searchConversations(query);
+        }, 300);
+    }
+
+    searchConversations(query) {
+        const searchTerm = query.toLowerCase().trim();
+        
+        if (searchTerm === '') {
+            this.displayConversations(this.conversations);
+            return;
+        }
+
+        const filteredConversations = this.conversations.filter(conversation => {
+            // Search in product name
+            const productName = conversation.product?.name?.toLowerCase() || '';
+            // Search in seller name
+            const sellerName = conversation.sellerId?.username?.toLowerCase() || '';
+            // Search in buyer name
+            const buyerName = conversation.buyerId?.username?.toLowerCase() || '';
+            // Search in last message
+            const lastMessage = conversation.lastMessage?.toLowerCase() || '';
+
+            return productName.includes(searchTerm) ||
+                   sellerName.includes(searchTerm) ||
+                   buyerName.includes(searchTerm) ||
+                   lastMessage.includes(searchTerm);
+        });
+
+        this.displayConversations(filteredConversations);
+        this.showSearchResultsInfo(filteredConversations.length, searchTerm);
+    }
+
+    showSearchResultsInfo(resultCount, searchTerm) {
+        const conversationsContainer = document.querySelector('.conversations-container');
+        let resultsInfo = conversationsContainer.querySelector('.search-results-info');
+        
+        if (!resultsInfo) {
+            resultsInfo = document.createElement('div');
+            resultsInfo.className = 'search-results-info';
+            conversationsContainer.insertBefore(resultsInfo, conversationsContainer.firstChild);
+        }
+        
+        if (resultCount === 0) {
+            resultsInfo.innerHTML = `<i class="fas fa-search"></i> No conversations found for "${searchTerm}"`;
+        } else {
+            resultsInfo.innerHTML = `<i class="fas fa-search"></i> Found ${resultCount} conversation${resultCount === 1 ? '' : 's'} for "${searchTerm}"`;
+        }
+        
+        resultsInfo.classList.add('show');
+    }
+
+    toggleSearchClearButton(value) {
+        const searchContainer = document.querySelector('.search-container');
+        let clearButton = searchContainer.querySelector('.clear-search-btn');
+        
+        if (value.length > 0) {
+            if (!clearButton) {
+                clearButton = document.createElement('button');
+                clearButton.className = 'clear-search-btn';
+                clearButton.innerHTML = '<i class="fas fa-times"></i>';
+                clearButton.title = 'Clear search';
+                clearButton.addEventListener('click', () => {
+                    this.clearSearch();
+                });
+                searchContainer.appendChild(clearButton);
+            }
+            clearButton.style.display = 'block';
+        } else {
+            if (clearButton) {
+                clearButton.style.display = 'none';
+            }
+        }
+    }
+
+    clearSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            this.handleConversationSearch('');
+            searchInput.focus();
+        }
+        
+        // Hide search results info
+        const resultsInfo = document.querySelector('.search-results-info');
+        if (resultsInfo) {
+            resultsInfo.classList.remove('show');
+        }
+    }
+
+    showSearchSuggestions() {
+        // Add visual feedback when search is focused
+        const searchContainer = document.querySelector('.search-container');
+        if (searchContainer) {
+            searchContainer.classList.add('search-focused');
+        }
+    }
+
+    hideSearchSuggestions() {
+        // Remove visual feedback when search loses focus
+        const searchContainer = document.querySelector('.search-container');
+        if (searchContainer) {
+            searchContainer.classList.remove('search-focused');
+        }
+    }
+
     // User Search Functionality
     initUserSearch() {
         this.searchTimeout = null;
+        this.conversationSearchTimeout = null;
         this.bindUserSearchEvents();
     }
 
@@ -915,13 +1065,81 @@ class MessagingDashboard {
 
     // Check if conversation already exists between buyer and seller for this product
     async checkExistingConversation(productId, sellerId) {
-        console.log('Existing conversation check - to be implemented');
-        return false;
+        try {
+            console.log('Checking for existing conversation:', { productId, sellerId });
+            
+            const response = await fetch('/api/conversations');
+            if (!response.ok) {
+                console.error('Failed to fetch conversations');
+                return false;
+            }
+
+            const responseData = await response.json();
+            const conversations = responseData.data || responseData;
+            
+            if (!Array.isArray(conversations)) {
+                console.error("Conversations data is not an array:", conversations);
+                return false;
+            }
+
+            // Check if there's already a conversation for this product and seller
+            const existingConversation = conversations.find(conv => 
+                conv.product && conv.product._id === productId && conv.sellerId && conv.sellerId._id === sellerId
+            );
+
+            if (existingConversation) {
+                console.log('Found existing conversation:', existingConversation);
+                return existingConversation;
+            }
+
+            console.log('No existing conversation found');
+            return false;
+        } catch (error) {
+            console.error('Error checking for existing conversation:', error);
+            return false;
+        }
     }
 
     // Start a new conversation with the supplier
     async startNewConversationWithSupplier(productInfo) {
-        console.log('Start new conversation - to be implemented');
+        try {
+            console.log('Starting new conversation with supplier:', productInfo);
+            
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('Please log in to start a conversation');
+                return;
+            }
+
+            const response = await fetch('/api/conversations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    buyerId: userId,
+                    sellerId: productInfo.sellerId,
+                    productId: productInfo.productId
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to create conversation');
+            }
+
+            const responseData = await response.json();
+            const conversationData = responseData.data || responseData;
+            
+            console.log('Conversation created:', conversationData);
+            
+            // Redirect to messaging page with the new conversation
+            window.location.href = `/messaging?conversationId=${conversationData.conversation._id}`;
+            
+        } catch (error) {
+            console.error('Error starting conversation:', error);
+            alert('Failed to start conversation: ' + error.message);
+        }
     }
 }
 

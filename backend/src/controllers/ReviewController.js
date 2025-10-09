@@ -27,27 +27,60 @@ class ReviewController extends BaseController {
       return this.sendError(res, 'Please log in as a buyer to submit reviews', 403);
     }
 
-    const { orderId, rating, comment, experience, title } = req.body;
+    const { orderId, productId, sellerId, rating, comment, experience, title, buyerId } = req.body;
 
-    await this.handleServiceResponse(
-      res,
-      ReviewService.submitReview({
+    // Debug logging
+    console.log('Review submission request:', {
+      userId,
+      role,
+      orderId,
+      productId,
+      sellerId,
+      rating,
+      comment: comment ? comment.substring(0, 50) + '...' : null,
+      experience,
+      title,
+      buyerId
+    });
+
+    // Use the buyerId from request body if provided, otherwise use session userId
+    const finalBuyerId = buyerId || userId;
+
+    try {
+      const result = await ReviewService.submitReview({
         orderId,
+        productId,
+        sellerId,
         rating,
         comment,
         experience,
         title,
-        buyerId: userId
-      }),
-      'Review submitted successfully',
-      201
-    );
+        buyerId: finalBuyerId
+      });
+
+      if (result && result.success === false) {
+        return this.sendError(res, result.message || 'Service error', 400);
+      }
+
+      return this.sendSuccess(res, result, 'Review submitted successfully', 201);
+    } catch (error) {
+      console.error('Error in submitReview controller:', error);
+      console.error('Error stack:', error.stack);
+      return this.sendError(res, error.message || 'Internal server error', 500, error);
+    }
   });
 
   /**
    * Get reviews for a seller
    */
   getSellerReviews = this.asyncHandler(async (req, res) => {
+    console.log('getSellerReviews called with:', { 
+      sellerId: req.params.sellerId, 
+      url: req.url, 
+      method: req.method,
+      query: req.query 
+    });
+    
     const { sellerId } = req.params;
     const { page = 1, limit = 10, sortBy = 'newest' } = req.query;
 
@@ -181,6 +214,23 @@ class ReviewController extends BaseController {
         limit: parseInt(limit)
       }),
       'Buyer reviews retrieved successfully'
+    );
+  });
+
+  /**
+   * Get reviewable orders for buyer
+   */
+  getReviewableOrders = this.asyncHandler(async (req, res) => {
+    const { userId, role } = this.getUserSession(req);
+    
+    if (!userId || role !== 'buyer') {
+      return this.sendError(res, 'Please log in as a buyer', 403);
+    }
+
+    await this.handleServiceResponse(
+      res,
+      ReviewService.getReviewableOrders(userId),
+      'Reviewable orders retrieved successfully'
     );
   });
 }

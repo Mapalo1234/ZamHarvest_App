@@ -82,6 +82,19 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           setupMessagingFunctionality(product);
           loadProductReviews(product._id);
+          
+          // Set global variables for review functionality
+          if (typeof currentProductId !== 'undefined') {
+            currentProductId = product._id;
+          }
+          if (typeof currentSellerId !== 'undefined') {
+            currentSellerId = product.sellerId;
+          }
+          
+          // Toggle write review button
+          if (typeof toggleWriteReviewButton !== 'undefined') {
+            toggleWriteReviewButton();
+          }
         }, 500);
       } else {
         document.querySelector('#temporaryContent').innerHTML = "<p>Product not found.</p>";
@@ -191,13 +204,13 @@ function setupMessagingFunctionality(product) {
           });
 
           if (!conversationResponse.ok) {
-            const errorText = await conversationResponse.text();
+            const errorData = await conversationResponse.json().catch(() => ({}));
             console.error('Conversation creation failed:', {
               status: conversationResponse.status,
               statusText: conversationResponse.statusText,
-              error: errorText
+              error: errorData.message || 'Unknown error'
             });
-            throw new Error(`Failed to create conversation: ${conversationResponse.status} - ${errorText}`);
+            throw new Error(`Failed to create conversation: ${errorData.message || conversationResponse.statusText}`);
           }
 
           const responseData = await conversationResponse.json();
@@ -210,6 +223,10 @@ function setupMessagingFunctionality(product) {
           // Extract conversation ID and new conversation flag
           const conversationId = conversationData.conversation?._id || conversationData.conversationId;
           const isNewConversation = conversationData.isNewConversation || false;
+          
+          if (!conversationId) {
+            throw new Error('No conversation ID returned from server');
+          }
           
           console.log('Conversation ID:', conversationId);
           console.log('Is new conversation:', isNewConversation);
@@ -369,50 +386,130 @@ function displayReviews(reviewsData) {
     return;
   }
   
-  const reviewsHTML = reviews.map(review => {
-    const reviewDate = new Date(review.createdAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-    
-    const buyerName = review.buyerId?.username || 'Anonymous Buyer';
-    const buyerInitial = buyerName.charAt(0).toUpperCase();
-    
-    const starsHTML = generateStarsHTML(review.rating);
-    
-    return `
-      <div class="review-item">
-        <div class="review-header">
-          <div class="reviewer-info">
-            <div class="reviewer-avatar">${buyerInitial}</div>
-            <div class="reviewer-details">
-              <h4>${escapeHtml(buyerName)}</h4>
-              ${review.isVerified ? '<div class="verified"><i class="fa fa-check-circle"></i> Verified Purchase</div>' : ''}
-            </div>
-          </div>
-          <div class="review-rating">
-            <div class="review-stars">${starsHTML}</div>
-            <span class="review-date">${reviewDate}</span>
-            <span class="review-experience ${review.experience}">${review.experience.replace('-', ' ')}</span>
+  // Store all reviews globally for view more functionality
+  window.allReviews = reviews;
+  window.showingAllReviews = false;
+  
+  // Show only first 3 reviews initially
+  const initialReviews = reviews.slice(0, 3);
+  const hasMoreReviews = reviews.length > 3;
+  
+  const reviewsHTML = initialReviews.map(review => createReviewHTML(review)).join('');
+  
+  // Add view more button if there are more than 3 reviews
+  const viewMoreButton = hasMoreReviews ? `
+    <div class="view-more-reviews">
+      <button class="view-more-btn" onclick="toggleAllReviews()">
+        <i class="fa fa-chevron-down"></i>
+        View More Reviews (${reviews.length - 3} more)
+      </button>
+    </div>
+  ` : '';
+  
+  container.innerHTML = reviewsHTML + viewMoreButton;
+  
+  // Add collapsed class when showing only 3 reviews
+  if (hasMoreReviews) {
+    container.classList.add('collapsed');
+  }
+}
+
+function createReviewHTML(review) {
+  const reviewDate = new Date(review.createdAt).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: '2-digit'
+  });
+  
+  const buyerName = review.buyerId?.username || 'Anonymous Buyer';
+  const buyerInitial = buyerName.charAt(0).toUpperCase();
+  
+  const starsHTML = generateStarsHTML(review.rating);
+  
+  return `
+    <div class="review-item">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="reviewer-avatar">${buyerInitial}</div>
+          <div class="reviewer-details">
+            <h4>${escapeHtml(buyerName)}</h4>
+            ${review.isVerified ? '<div class="verified"><i class="fa fa-check-circle"></i> Verified</div>' : ''}
           </div>
         </div>
-        
-        ${review.title ? `<div class="review-title">${escapeHtml(review.title)}</div>` : ''}
-        
-        <div class="review-comment">${escapeHtml(review.comment)}</div>
-        
-        <div class="review-footer">
-          <div class="review-helpful">
-            <i class="fa fa-thumbs-up"></i>
-            <span>Helpful (${review.helpfulVotes || 0})</span>
-          </div>
+        <div class="review-rating">
+          <div class="review-stars">${starsHTML}</div>
+          <span class="review-date">${reviewDate}</span>
+          <span class="review-experience ${review.experience}">${review.experience.replace('-', ' ')}</span>
         </div>
       </div>
-    `;
-  }).join('');
+      
+      ${review.title ? `<div class="review-title">${escapeHtml(review.title)}</div>` : ''}
+      
+      <div class="review-comment">${escapeHtml(review.comment)}</div>
+      
+      <div class="review-footer">
+        <div class="review-helpful">
+          <i class="fa fa-thumbs-up"></i>
+          <span>Helpful (${review.helpfulVotes || 0})</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAllReviews() {
+  const container = document.getElementById('reviewsContainer');
+  const viewMoreBtn = container.querySelector('.view-more-btn');
   
-  container.innerHTML = reviewsHTML;
+  // Add loading state
+  if (viewMoreBtn) {
+    viewMoreBtn.classList.add('loading');
+    viewMoreBtn.disabled = true;
+  }
+  
+  // Simulate a brief loading delay for better UX
+  setTimeout(() => {
+    if (!window.showingAllReviews) {
+      // Show all reviews
+      const allReviewsHTML = window.allReviews.map(review => createReviewHTML(review)).join('');
+      const viewLessButton = `
+        <div class="view-more-reviews">
+          <button class="view-more-btn" onclick="toggleAllReviews()">
+            <i class="fa fa-chevron-up"></i>
+            View Less Reviews
+          </button>
+        </div>
+      `;
+      
+      container.innerHTML = allReviewsHTML + viewLessButton;
+      container.classList.remove('collapsed');
+      window.showingAllReviews = true;
+      
+      // Smooth scroll to the button after expanding
+      setTimeout(() => {
+        const button = container.querySelector('.view-more-btn');
+        if (button) {
+          button.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
+    } else {
+      // Show only first 3 reviews
+      const initialReviews = window.allReviews.slice(0, 3);
+      const reviewsHTML = initialReviews.map(review => createReviewHTML(review)).join('');
+      const viewMoreButton = `
+        <div class="view-more-reviews">
+          <button class="view-more-btn" onclick="toggleAllReviews()">
+            <i class="fa fa-chevron-down"></i>
+            View More Reviews (${window.allReviews.length - 3} more)
+          </button>
+        </div>
+      `;
+      
+      container.innerHTML = reviewsHTML + viewMoreButton;
+      container.classList.add('collapsed');
+      window.showingAllReviews = false;
+    }
+  }, 200);
 }
 
 function updateReviewsSummary(reviewsData) {

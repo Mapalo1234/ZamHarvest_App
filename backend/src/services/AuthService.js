@@ -4,6 +4,7 @@ const Buyer = require("../models/buyer");
 const Seller = require("../models/seller");
 const sendEmail = require("../utils/sendEmail");
 const BaseService = require("./BaseService");
+const { AppError } = require("../utils/ErrorHandler");
 
 /**
  * Authentication Service
@@ -33,13 +34,13 @@ class AuthService extends BaseService {
       // Determine the model based on role
       const Model = role === "buyer" ? Buyer : role === "seller" ? Seller : null;
       if (!Model) {
-        throw new Error("Invalid role. Must be 'buyer' or 'seller'");
+        throw new AppError("Invalid role. Must be 'buyer' or 'seller'", 400);
       }
 
       // Check if user already exists
       const existingUser = await Model.findOne({ email });
       if (existingUser) {
-        throw new Error("Email already exists");
+        throw new AppError("Email already exists", 409);
       }
 
       // Generate verification token
@@ -82,7 +83,7 @@ class AuthService extends BaseService {
       this.log('verifyUser', { token });
 
       if (!token) {
-        throw new Error("Verification token is required");
+        throw new AppError("Verification token is required", 400);
       }
 
       // Check in both Buyer and Seller models
@@ -92,7 +93,7 @@ class AuthService extends BaseService {
       }
 
       if (!user) {
-        throw new Error("Invalid or expired verification token");
+        throw new AppError("Invalid or expired verification token", 400);
       }
 
       if (user.isVerified) {
@@ -137,7 +138,7 @@ class AuthService extends BaseService {
         if (result.user.role === 'buyer') {
           await NotificationService.createNotification(
             result.user.id,
-            'Buyer',
+            'buyer',
             'welcome',
             'Welcome to ZamHarvest!',
             'Welcome to ZamHarvest Marketplace! Start exploring fresh agricultural products from local farmers.',
@@ -146,7 +147,7 @@ class AuthService extends BaseService {
         } else if (result.user.role === 'seller') {
           await NotificationService.createNotification(
             result.user.id,
-            'Seller',
+            'seller',
             'welcome',
             'Welcome to ZamHarvest!',
             'Welcome to ZamHarvest Marketplace! Start listing your agricultural products and connect with buyers.',
@@ -196,17 +197,17 @@ class AuthService extends BaseService {
       }
 
       if (!user) {
-        throw new Error("Invalid username or password");
+        throw new AppError("Invalid username or password", 401);
       }
 
       if (!user.isVerified) {
-        throw new Error("Please verify your email before logging in");
+        throw new AppError("Please verify your email before logging in", 401);
       }
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
-        throw new Error("Invalid username or password");
+        throw new AppError("Invalid username or password", 401);
       }
 
       this.log('loginUser completed', { userId: user._id, role });
@@ -237,12 +238,12 @@ class AuthService extends BaseService {
 
       const Model = role === "buyer" ? Buyer : role === "seller" ? Seller : null;
       if (!Model) {
-        throw new Error("Invalid role");
+        throw new AppError("Invalid role", 400);
       }
 
       const user = await Model.findById(userId);
       if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
       }
 
       return {
@@ -265,7 +266,7 @@ class AuthService extends BaseService {
    */
   async ensureBuyer(userId, role) {
     if (!userId || role !== "buyer") {
-      throw new Error("You must be logged in as a buyer to access this resource");
+      throw new AppError("You must be logged in as a buyer to access this resource", 403);
     }
     return true;
   }
@@ -278,7 +279,7 @@ class AuthService extends BaseService {
    */
   async ensureSeller(userId, role) {
     if (!userId || role !== "seller") {
-      throw new Error("You must be logged in as a seller to access this resource");
+      throw new AppError("You must be logged in as a seller to access this resource", 403);
     }
     return true;
   }
