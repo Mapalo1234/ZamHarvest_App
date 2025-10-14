@@ -1,0 +1,672 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Poppins:wght@100;200;300;400&display=swap');
+
+:root {
+    --dark1: #0000004d;
+    --dark2: #181c20;
+    --dark3: #212529;
+    --dark4: #2d3135;
+    --dark5: #424549;
+    --dark6: #404346;
+    --dark7: #9c9c9c;
+    --dark8: #dae0e7;
+    --dark9: #262a2e;
+    --red1: #902e31;
+    --accent: #ff4c4c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center ;
+    min-height: 100vh;
+    /* padding: 20px; */
+}
+
+/* Main Container */
+.container {
+    width: 100%;
+    /* max-width: 1200px; */
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 3px 3px 25px var(--dark1);
+    margin-top: 50px;
+}
+
+.payimg {
+    width: 100%;
+}
+
+.payimg img {
+    max-width: 100%;
+    height: auto;
+}
+
+table td img {
+    border-radius: 5px;
+}
+
+#paymentModal img {
+    margin-left: 50px;
+}
+
+/* Header Section */
+.container header .filterEntries {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filterEntries .entries {
+    color: white;
+    font-weight: 400;
+}
+
+.filterEntries select,
+.filterEntries input {
+    padding: 8px 12px;
+    border: 1px solid var(--dark6);
+    background: white;
+    color: var(--dark8);
+    border-radius: 6px;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.filterEntries select:hover,
+.filterEntries input:focus {
+    border-color: var(--accent);
+}
+
+/* Add Button */
+header .addMemberBtn button {
+    padding: 10px 18px;
+    color: var(--dark8);
+    background: var(--dark4);
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid var(--dark6);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.addMemberBtn button:hover {
+    background: var(--dark5);
+}
+
+/* Table */
+.container table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 10px;
+}
+
+table tr th,
+table tr td {
+    padding: 8px 4px;
+    color: rgb(0, 0, 0);
+    border-bottom: 1px solid var(--dark6);
+}
+
+/* Action column styling to prevent wrapping */
+table tr td:last-child {
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+table tr{
+    font-weight: 500;
+    cursor: pointer;
+}
+
+
+table tbody tr:nth-child(odd) {
+    background: rgb(187, 187, 188);
+
+}
+
+table tbody tr:hover {
+    background: rgb(135, 135, 135);
+    color: white;
+    transition: 0.3s;
+}
+
+/* Table Action Buttons - Match requestTable style exactly */
+table td button {
+    margin: 0 3px;
+    padding: 6px;
+    width: 36px;
+    background: var(--dark5);
+    color: var(--dark8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+table td button:hover {
+    background: rgb(140, 140, 140);
+    color: #fff;
+}
+
+/* Footer + Pagination */
+.container footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--dark8);
+    font-size: 16px;
+}
+
+footer .pagination {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+footer .pagination button {
+    padding: 8px 12px;
+    color: var(--dark8);
+    background: var(--dark4);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+footer .pagination button:first-child,
+footer .pagination button:last-child {
+    font-weight: 500;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+footer .pagination button.act {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+footer .pagination button:hover {
+    background: rgb(49, 49, 49);
+    color: #fff;
+}
+
+footer .pagination button.active {
+    background: rgb(86, 153, 86);
+    color: #fff;
+}
+
+/* Popup Background */
+.dark_bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.dark_bg.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Popup Container */
+.popup {
+    background: white;
+    border: solid 1px black;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    width: 550px;
+    max-width: 95%;
+    transform: scale(0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+}
+
+.imgholder .img {
+    border-radius: 5px;
+}
+
+.popup.active {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Popup Header */
+.popup header {
+    border-bottom: 1px solid var(--dark7);
+    padding: 12px 20px;
+    font-size: 18px;
+    margin-left: 90px;
+
+}
+
+.popup header .closeBtn {
+    width: 50px;
+    background-color: white;
+    border-radius: 50%;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.popup header .closeBtn:hover {
+    color: red
+}
+
+/* Popup Form (Two-Column Layout) */
+.popup form {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 20px; /* row gap | column gap */
+}
+
+.form_control {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form_control label {
+    color: rgb(74, 73, 73);
+    font-size: 14px;
+}
+
+.form_control input,
+.form_control select {
+    padding: 10px;
+    border: 1px solid var(--dark6);
+    background: rgb(205, 205, 205);
+    color: black;
+    font-size: 15px;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    outline: none;
+    transition: 0.3s;
+    width: 100%;
+}
+
+
+/* Status Styles */
+.status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-pending {
+    border: 1px solid #7f6310;
+    color: #7f6310;
+    border: 1px solid #ffeaa7;
+}
+
+.status-accepted {
+    border: 1px solid #155724;
+    color: #155724;
+}
+
+.status-rejected {
+    color: #721c24;
+    border: 1px solid #721c24;
+}
+
+.status-paid {
+    color: #004085;
+    border: 1px solid #004085;
+}
+
+.status-shipped {
+    color: #856404;
+    border: 1px solid #ffc107;
+    background-color: #fff3cd;
+}
+
+.status-delivered {
+    color: #155724;
+    border: 1px solid #28a745;
+    background-color: #d4edda;
+}
+
+/* Action Button Styles */
+.action-btn {
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-btn.payment {
+    background: #007bff;
+    color: white;
+}
+
+.action-btn.payment:hover {
+    background: #0056b3;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.action-btn.delivery {
+    background: #28a745;
+    color: white;
+}
+
+.action-btn.delivery:hover {
+    background: #218838;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(40,167,69,0.3);
+}
+
+.action-btn.review {
+    background: #ffc107;
+    color: #212529;
+}
+
+.action-btn.review:hover {
+    background: #e0a800;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(255,193,7,0.3);
+}
+
+.action-btn.disabled {
+    background: #6c757d;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.action-btn.disabled:hover {
+    transform: none;
+    background: #6c757d;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Add focus styles for accessibility */
+.action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.action-btn.payment:focus {
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.action-btn.delivery:focus {
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.25);
+}
+
+.action-btn.review:focus {
+    box-shadow: 0 0 0 3px rgba(255,193,7,0.25);
+}
+
+/* Add active state for better feedback */
+.action-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+/* Ensure icons are properly centered */
+.action-btn i {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Info and Smart Action Button Styles - Match requestTable */
+.info-btn, .smart-btn {
+    margin: 0 2px;
+    padding: 8px;
+    width: 32px;
+    background: var(--dark5);
+    color: var(--dark8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* Smart button in cancel mode */
+.smart-btn.cancel-mode {
+    background: #edc243;
+    color: #212529;
+}
+
+.smart-btn.cancel-mode:hover {
+    background: #d4ac0d;
+    color: #212529;
+}
+
+/* Smart button in delete mode */
+.smart-btn.delete-mode {
+    background: #dc3545;
+    color: white;
+}
+
+.smart-btn.delete-mode:hover {
+    background: #c82333;
+    color: white;
+}
+
+/* Button text styling */
+.smart-btn .btn-text {
+    font-size: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Legacy button styles for backward compatibility - Match requestTable */
+.cancel-btn, .delete-btn {
+    margin: 0 2px;
+    padding: 4px;
+    width: 32px;
+    background: var(--dark5);
+    color: var(--dark8);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.cancel-btn {
+    background: #edc243;
+    color: #212529;
+}
+
+.cancel-btn:hover {
+    background: #d4ac0d;
+    color: #212529;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    color: white;
+}
+
+.info-btn:hover {
+    background: #5a6268;
+}
+
+.delete-btn:hover {
+    background: #dc3545;
+}
+
+/* Disabled button styles */
+.purchase-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #ccc !important;
+    color: #666 !important;
+}
+
+.purchase-btn:disabled:hover {
+    background: #ccc !important;
+    color: #666 !important;
+}
+
+/* ---------- Modal Background ---------- */
+.modal {
+  display: none;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  justify-content: center;  
+  align-items: center;     
+}
+
+
+/* ---------- Modal Content Box ---------- */
+.modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: left;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideDown 0.5s ease-in;
+}
+
+/* Slide-down animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close button */
+.close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 24px;
+  color: #555;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+/* Form heading */
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #333;
+  text-align: center;
+}
+
+/* Form inputs */
+.modal-content input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  margin-left: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.modal-content input:focus {
+  border-color: #28a745;
+  outline: none;
+}
+
+.modal-content label {
+  margin-left: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Buttons */
+.modal-content button {
+  padding: 12px;
+  width: 80%;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 12px 0px 20px 40px;
+}
+
+.modal-content button[type="submit"] {
+  background: #28a745;
+  color: #fff;
+}
+
+.modal-content button[type="submit"]:hover {
+  background: #218838;
+}
+
+.modal-content .btn-cancel {
+  background: #dc3545;
+  color: #fff;
+}
+
+.modal-content .btn-cancel:hover {
+  background: #c82333;
+}

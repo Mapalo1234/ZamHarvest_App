@@ -1,0 +1,20 @@
+{
+  "name": "zamharvest-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for ZamHarvest marketplace",
+  "main": "public/js/main.js",
+  "scripts": {
+    "start": "echo \"Frontend static files - serve with backend or use a static server\"",
+    "dev": "echo \"Frontend development - serve with backend or use live-server\""
+  },
+  "keywords": [
+    "frontend",
+    "marketplace",
+    "agriculture"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}

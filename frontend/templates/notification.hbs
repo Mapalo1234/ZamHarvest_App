@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notifications - ZamHarvest</title>
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/notifications.css">
+  <link rel="stylesheet" href="all/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/loader.css">
+
+</head>
+
+<body>
+
+  <div class="notification-page">
+    <h1>Notifications</h1>
+    
+    <!-- Statistics -->
+    <div class="notification-stats">
+      <div class="stat-card">
+        <div class="stat-number" id="totalNotifications">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="unreadNotifications">0</div>
+        <div class="stat-label">Unread</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="todayNotifications">0</div>
+        <div class="stat-label">Today</div>
+      </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="notification-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="unread">Unread</button>
+      <button class="filter-btn" data-filter="orders">Orders</button>
+      <button class="filter-btn" data-filter="requests" id="requestsFilter" style="display: none;">Requests</button>
+      <button class="filter-btn" data-filter="payments">Payments</button>
+      <button class="filter-btn" data-filter="delivery">Delivery</button>
+      <button class="filter-btn" data-filter="reviews">Reviews</button>
+    </div>
+    
+    <!-- Notifications Container -->
+    <div class="notifications-container">
+      <div class="notifications-header">
+        <h3>Your Notifications</h3>
+        <div>
+          <button class="action-btn" id="markAllReadBtn">Mark All Read</button>
+          <button class="action-btn" id="refreshBtn">Refresh</button>
+        </div>
+      </div>
+      
+      <div class="notifications-list" id="notificationsList">
+        <div class="empty-state">
+          <i class="fa fa-bell-slash"></i>
+          <p>No notifications yet</p>
+        </div>
+      </div>
+      
+      <div class="load-more" id="loadMoreContainer" style="display: none;">
+        <button class="load-more-btn" id="loadMoreBtn">Load More</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader-wrapper">
+    <span class="loader"></span>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none";
+      }
+    });
+  </script>
+  
+  <script src="/js/loginscript.js"></script>
+  <script src="js/notificationSystem.js"></script>
+  <script src="js/notification.js"></script>
+</body>
+</html>

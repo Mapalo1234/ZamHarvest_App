@@ -1,0 +1,125 @@
+/* Inventory Management Styles */
+
+.inventory-info {
+  margin-top: 8px;
+  font-size: 0.9em;
+}
+
+.inventory-info .stock {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #e9ecef;
+}
+
+.inventory-info .stock.low-stock {
+  background: #f8d7da;
+  color: #721c24;
+  font-weight: bold;
+}
+
+.inventory-info .organic {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #d4edda;
+  color: #155724;
+  font-size: 0.8em;
+}
+
+.actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.stock-btn,
+.edit-btn,
+.delete-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stock-btn {
+  background: #17a2b8;
+  color: white;
+}
+
+.stock-btn:hover {
+  background: #138496;
+  transform: scale(1.1);
+}
+
+.edit-btn {
+  background: #ffc107;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #e0a800;
+  transform: scale(1.1);
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+/* Form step styles for inventory */
+.form-step h3 {
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 5px;
+}
+
+.form-step input[type="number"],
+.form-step input[type="date"],
+.form-step select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-step input[type="number"]:focus,
+.form-step input[type="date"]:focus,
+.form-step select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+    gap: 3px;
+  }
+  
+  .stock-btn,
+  .edit-btn,
+  .delete-btn {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+  
+  .inventory-info {
+    font-size: 0.8em;
+  }
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZamHarvest</title>
+  <link rel="stylesheet" href="css/listproduct.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/progress.css">
+  <link rel="stylesheet" href="all/css/font-awesome.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/search.css">
+   <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+  <header id="navbar">
+    <nav>
+      <a class="logo" href="/home">ZamHarvest</a>
+      <ul class="menu">
+        <li><a href="/home" class="active">Home</a></li>
+        <li><a href="/view">Sale</a></li>
+        <li><a href="/orderTable">Orders</a></li>
+      </ul>
+    </nav>
+              <div class="login">
+             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
+               <div class="login-dropdown" id="loginDropdown">
+                <a href="/login">Login</a>
+                <a href="account.html">Manage Account</a>
+             </div>
+          </div>
+     <div class="notfication-logo">
+        <i class="fa fa-bell" aria-hidden="true"></i>
+      <span class="badge">3</span>
+</div>
+  </header>
+
+  <!-- Banner -->
+  <section class="top-banner2">
+    <h2>Access to a Vast <span> Supplier</span> Network</h2>
+    <p>Get instant access to thousands of produce listings of all grades all in one place.</p>
+  </section>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <form action="#" class="search" id="search-bar">
+      <input type="search" placeholder="Search Item..." name="q" class="search__input">
+      <div class="search__button" id="search-button">
+        <i class="ri-search-2-line search__icon"></i>
+        <i class="ri-close-line search__close"></i>
+      </div>
+    </form>
+  </div>
+        <div class="tab_box">
+            <button class="tab_btn active" id="tab1" data-tab="tab1">All</button>
+            <button class="tab_btn" id="promotions" data-category="promotions"> Promotions</button>
+            <button class="tab_btn" id="fruits">Fruits</button>
+            <button class="tab_btn" id="vegetables">Vegetables</button>
+            <button class="tab_btn" id="meat">Meat</button>
+            <div class="line"></div>
+        </div>
+  <!-- Product Section -->
+  <div class="section-p1" id="product1">
+    <h2>NEW PRODUCTS</h2>
+    
+    <div class="pro-container" id="productList">
+      <!-- Products will be injected here -->
+    </div>
+  </div>
+      <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
+    <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
+  <script src="js/filter.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="/js/loginscript.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/listproduct.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/notificationSystem.js"></script>
+  <script src="js/authManager.js"></script>
+  <script src="js/navigation.js"></script>
+</body>
+</html>

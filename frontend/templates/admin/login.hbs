@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/css/loginstyle.css">
+    <link rel="stylesheet" href="/css/admin-login.css">
+    <link rel="stylesheet" href="/css/loader.css">
+    <title>ZamHarvest Admin Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="img">
+            <img src="/image/zam.png">
+        </div>
+        <div class="wrapper">
+            <div class="form-header">
+                <div class="titles">
+                    <div class="title-login">Admin Login</div>
+                </div>
+            </div>
+            
+            {{#if error}}
+            <div class="error-message">
+                {{error}}
+            </div>
+            {{/if}}
+
+            <!-- ADMIN LOGIN FORM -->
+            <form class="login-form" autocomplete="off" method="post" id="loginForm" action="/admin/login">
+                <div class="input-box">
+                    <input type="text" name="username" class="input-field" id="username" required>
+                    <label for="username" class="label">Username or Email</label>
+                    <i class='bx bx-user icon'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password" class="input-field" id="password" required>
+                    <label for="password" class="label">Password</label>
+                    <i class='bx bx-lock-alt icon'></i>
+                </div>
+                <div class="form-cols">
+                    <div class="col-1"></div>
+                    <div class="col-2">
+                        <a href="#">Forgot password?</a>
+                    </div>
+                </div>
+                <div class="input-box">
+                    <button class="btn-submit" id="SignInBtn">Sign In <i class='bx bx-log-in'></i></button>
+                </div>
+                <div class="switch-form">
+                    <span>ZamHarvest Admin Dashboard</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Admin login form functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('SignInBtn');
+            
+            // Add loading state to button
+            form.addEventListener('submit', function() {
+                submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Signing In...';
+                submitBtn.disabled = true;
+            });
+            
+            // Add focus effects to input fields
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+        });
+
+        function showError(message) {
+            const errorDiv = document.querySelector('.error-message');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else {
+                const form = document.getElementById('loginForm');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                form.insertBefore(errorDiv, form.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>

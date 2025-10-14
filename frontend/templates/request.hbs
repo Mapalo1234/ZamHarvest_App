@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/orderTable.css">
+  <link rel="stylesheet" href="/css/requestDashboard.css">
+   <link rel="stylesheet" href="/all/css/font-awesome.min.css">
+     <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/loader.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+  <title>Request Management</title>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    <!-- Home Button -->
+    <div class="home-button">
+      <a href="/home" title="Go Home">
+        <i class="fa fa-home"></i>
+      </a>
+    </div>
+    
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <h1>Seller Dashboard</h1>
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <i class="fa fa-shopping-cart"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="totalRequests">0</span>
+          <span class="stat-label">Total Requests</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-check-circle"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="acceptedRequests">0</span>
+          <span class="stat-label">Accepted</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-clock-o"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="pendingRequests">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fa fa-dollar"></i>
+        <div class="stat-info">
+          <span class="stat-number" id="totalEarnings">K0</span>
+          <span class="stat-label">Earnings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Main Content Tabs -->
+  <div class="dashboard-tabs">
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="switchTab('requests')">
+        <i class="fa fa-inbox"></i>
+        Requests
+      </button>
+      <button class="tab-btn" onclick="switchTab('analytics')">
+        <i class="fa fa-chart-bar"></i>
+        Analytics
+      </button>
+      <button class="tab-btn" onclick="switchTab('notifications')">
+        <i class="fa fa-bell"></i>
+        Notifications
+      </button>
+    </div>
+
+    <!-- Requests Tab -->
+    <div id="requests-tab" class="tab-content active">
+      <div class="table-header">
+        <h3>Recent Requests</h3>
+        <div class="table-controls">
+          <select id="statusFilter" onchange="filterRequests()">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="request-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product Name</th>
+              <th>Buyer</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th>Total Price</th>
+              <th>Delivery Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody class="orderInfo"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics-tab" class="tab-content">
+      <div class="analytics-grid">
+        <div class="chart-container">
+          <h4>Request Trends</h4>
+          <div class="chart-placeholder">
+            <i class="fa fa-chart-line"></i>
+            <p>Request trends over time</p>
+          </div>
+        </div>
+        <div class="chart-container">
+          <h4>Top Products</h4>
+          <div class="chart-placeholder">
+            <i class="fa fa-chart-pie"></i>
+            <p>Most requested products</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div id="notifications-tab" class="tab-content">
+      <div class="notifications-container">
+        <h4>Recent Notifications</h4>
+        <div class="notifications-list" id="notificationsList">
+          <div class="notification-item">
+            <i class="fa fa-info-circle"></i>
+            <div class="notification-content">
+              <p>Welcome to your seller dashboard!</p>
+              <span class="notification-time">Just now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <div id="editPriceModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Edit Total Price</h3>
+      <input type="number" id="newPriceInput" min="0" />
+      <button id="savePriceBtn">Save</button>
+    </div>
+  </div>
+
+  <div id="noteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Add Note</h3>
+      <textarea id="noteInput" rows="4"></textarea>
+      <button id="saveNoteBtn">Save Note</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="showEntries"></span>
+    <div class="pagination"></div>
+  </footer>
+</div>
+   <div class="loader-container" id="loader" style="display: none;">
+        <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
+
+{{!-- <script src="js/orderTable.js"></script> --}}
+<script src="js/requestDashboard.js"></script>
+<script src="js/navigation.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
+</body>
+</html>

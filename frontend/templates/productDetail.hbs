@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/test.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/messaging.css">
+    <link rel="stylesheet" href="css/reviewSystem.css">
+    <link rel="stylesheet" href="all/css/font-awesome.min.css">
+    <title>Product Details</title>
+</head>
+<body>
+    <div class="back-link">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        <a href="/listproduct">Back to Market Place</a>
+    </div>
+    
+    <div id="temporaryContent" class="temporaryContent">
+        <div class="left-detail">
+            <div class="name-product">
+                <div class="title"></div>
+                <div class="type-Product"></div>
+            </div>
+            <div class="availability" id="availabilityID"></div>
+            <div class="image-container">
+                <img src="" alt="">
+            </div>
+        </div>
+        
+        <div class="right-detail">
+            <div class="content">
+                <div class="price-container">
+                    <div>
+                    <div class="price-lable"></div>
+                    <span class="slash">/</span>
+                    <div class="scale">ld</div>
+                    </div>
+                    <p class="final-price">Total Price: K<span id="finalPrice">00</span></p>
+                </div>
+                <label class="date-lable" for="date">Delivery Date</label>
+                <div class="delivery-date"><input type="date" placeholder="Delivery" id="deliveryDate" min=""></div>
+                <div class="price"></div>
+                
+                <label class="quantity" for="date">Add Quantity</label>
+                <div class="counter">
+                    <span class="minus">-</span>
+                    <span class="num">01</span>
+                    <span class="plus">+</span>
+                </div>
+                
+                <div class="buttons">
+                    <button class="order" type="button" data-product-id="{{product._id}}">ORDER</button>
+                    <button class="addCart" id="messageSupplierBtn" type="button">Message Supplier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+      <div class="p-container">
+    <p>
+      Edit, add new availabilities. To create a new listing, click on "Add New Product" below. Have more questions? <br>
+      email us at ZamHarvest@gmail.com.
+    </p>
+  </div>
+    <div class="aboutProduct">About Product:</div>
+    <div class="description"></div>
+    
+    <!-- Product Reviews Section -->
+    <div class="product-reviews-section">
+        <div class="reviews-header">
+            <h3>Customer Reviews</h3>
+            <div class="reviews-summary" id="reviewsSummary">
+                <div class="average-rating">
+                    <span class="rating-number">0.0</span>
+                    <div class="stars-display"></div>
+                    <span class="total-reviews">(0 reviews)</span>
+                </div>
+                <button class="write-review-btn" id="writeReviewBtn" onclick="openReviewModal()" style="display: none;">
+                    <i class="fa fa-star"></i> Write Review
+                </button>
+            </div>
+        </div>
+        
+        <div class="reviews-container" id="reviewsContainer">
+            <div class="loading-reviews">Loading reviews...</div>
+        </div>
+        
+        <div class="reviews-pagination" id="reviewsPagination" style="display: none;">
+            <button class="prev-reviews" id="prevReviews">Previous</button>
+            <span class="reviews-page-info">Page 1 of 1</span>
+            <button class="next-reviews" id="nextReviews">Next</button>
+        </div>
+    </div>
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Write a Review</h3>
+                <span class="close" onclick="reviewSystem.closeReviewForm()">&times;</span>
+            </div>
+            <form id="reviewForm" class="review-form">
+                <div class="form-group">
+                    <label for="reviewRating">Rating *</label>
+                    <div class="star-rating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <input type="hidden" id="reviewRating" name="rating" value="5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reviewExperience">Experience *</label>
+                    <select id="reviewExperience" name="experience" required>
+                        <option value="">Select your experience</option>
+                        <option value="poor">Poor</option>
+                        <option value="average">Average</option>
+                        <option value="good">Good</option>
+                        <option value="very-good">Very Good</option>
+                        <option value="excellent">Excellent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reviewComment">Comment *</label>
+                    <textarea id="reviewComment" name="comment" rows="4" maxlength="500" placeholder="Share your experience with this product..." required></textarea>
+                    <small class="char-count">0/500 characters</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="reviewSystem.closeReviewForm()">Cancel</button>
+                    <button type="submit" class="btn-submit">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="loader-wrapper">
+        <span class="loader"></span>
+    </div>
+
+    <script src="js/counter.js"></script>
+    <script src="/js/test.js"></script>
+    <script src="js/notificationSystem.js"></script>
+    <script src="js/authManager.js"></script>
+    <script src="/js/reviewSystem.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const loaderWrapper = document.querySelector(".loader-wrapper");
+        if (loaderWrapper) {
+          loaderWrapper.style.display = "none"; // Hide loader
+        }
+      });
+
+      // Global variables for review functionality
+      let currentProductId = null;
+      let currentSellerId = null;
+
+      // Function to open review modal
+      function openReviewModal() {
+        if (!currentProductId || !currentSellerId) {
+          alert('Product information not available');
+          return;
+        }
+
+        // Check if user can review this product
+        checkReviewEligibility();
+      }
+
+      // Check if user can review this product
+      async function checkReviewEligibility() {
+        try {
+          // For now, we'll show the modal if user is logged in
+          // In a real implementation, you'd check if they have a delivered order for this product
+          const modal = document.getElementById('reviewModal');
+          if (modal) {
+            modal.style.display = 'block';
+            // Initialize the review system for this product
+            if (window.reviewSystem) {
+              window.reviewSystem.currentProductId = currentProductId;
+              window.reviewSystem.currentSellerId = currentSellerId;
+              window.reviewSystem.resetReviewForm();
+            }
+          }
+        } catch (error) {
+          console.error('Error checking review eligibility:', error);
+          alert('Unable to check review eligibility');
+        }
+      }
+
+      // Function to show/hide write review button based on user authentication
+      function toggleWriteReviewButton() {
+        const writeReviewBtn = document.getElementById('writeReviewBtn');
+        if (writeReviewBtn) {
+          // Check if user is logged in (you can implement proper authentication check)
+          const isLoggedIn = checkUserAuthentication(); // Implement this function
+          writeReviewBtn.style.display = isLoggedIn ? 'block' : 'none';
+        }
+      }
+
+      // Function to check user authentication (implement based on your auth system)
+      function checkUserAuthentication() {
+        // This is a placeholder - implement based on your authentication system
+        // You might check localStorage, sessionStorage, or make an API call
+        return localStorage.getItem('userId') !== null || sessionStorage.getItem('userId') !== null;
+      }
+
+      // Message Supplier button functionality will be implemented here
+
+</body>
+</html>

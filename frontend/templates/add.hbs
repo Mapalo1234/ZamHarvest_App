@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title >Add Product - Dashboard</title>
+  <link rel="stylesheet" href="/css/add.css" />
+  <link rel="stylesheet" href="/css/inventory.css" />
+  <link rel="stylesheet" href="all/css/font-awesome.min.css" />
+   <link rel="stylesheet" href="css/loader.css">
+   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Mobile Responsive CSS -->
+  <link rel="stylesheet" href="css/mobile-responsive.css">
+</head>
+<body>
+  <!-- Dashboard Stats Cards -->
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-boxes"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Total Products</h3>
+        <p class="stat-number">0</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Active Promotions</h3>
+        <p class="stat-number">0</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-leaf"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Organic Products</h3>
+        <p class="stat-number">0</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Low Stock</h3>
+        <p class="stat-number">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <div class="content-header">
+      <h1 id="formTitle">Add New Product</h1>
+      <p class="form-subtitle">Fill in the product details step by step</p>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-steps">
+        <div class="step active" data-step="1">
+          <div class="step-circle">1</div>
+          <span>Basic Info</span>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-circle">2</div>
+          <span>Location</span>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-circle">3</div>
+          <span>Media</span>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-circle">4</div>
+          <span>Promotion</span>
+        </div>
+        <div class="step" data-step="5">
+          <div class="step-circle">5</div>
+          <span>Inventory</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+      <form id="productForm">
+        <!-- Step 1 -->
+        <div class="form-step active">
+      <input type="text" id="name" placeholder="Product Name" required />
+      <input type="number" id="price" placeholder="Price" required />
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="fruit">Fruit</option>
+        <option value="vegetable">Vegetable</option>
+        <option value="Meat">Meat</option>
+      </select>
+      <button type="button" class="next-btn">Next</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="form-step">
+      <select id="province" required>
+        <option value="">Select Province</option>
+      </select>
+      <select id="location" required>
+        <option value="">Select Town</option>
+      </select>
+      <select id="organicStatus">
+        <option value="">Select Organic Status</option>
+        <option value="Organic">Organic</option>
+        <option value="Non-Organic">Non-Organic</option>
+        <option value="Certified Organic">Certified Organic</option>
+      </select>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="form-step">
+      <div id="drop-area">
+        <input type="file" id="inputFile" hidden />
+        <div id="image-view"><i class="fa fa-upload"></i><p>Upload Image</p></div>
+      </div>
+      <textarea id="description" placeholder="Enter product description..." required></textarea>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 4 - Promotion Settings -->
+    <div class="form-step">
+      <h3>Promotion Settings</h3>
+      <div class="promotion-toggle">
+        <label for="isOnPromotion">
+          <input type="checkbox" id="isOnPromotion" />
+          Enable Promotion
+        </label>
+      </div>
+      <div id="promotionFields" style="display: none;">
+        <input type="number" id="promoPrice" placeholder="Promotional Price" min="0" step="0.01" />
+        <input type="date" id="promotionEndDate" placeholder="Promotion End Date" />
+        <small>Leave end date empty for indefinite promotion</small>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="button" class="next-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 5 - Inventory Information -->
+    <div class="form-step">
+      <h3>Inventory Information</h3>
+      <label for="availability">Availability:</label>
+      <select name="availability" id="availability" required>
+        <option value="Available">Available</option>
+        <option value="Unavailable">Unavailable</option>
+      </select>
+      <select id="unit" required>
+        <option value="">Select Unit</option>
+        <option value="kg">Kilograms (kg)</option>
+        <option value="lbs">Pounds (lbs)</option>
+        <option value="pieces">Pieces</option>
+        <option value="bags">Bags</option>
+        <option value="boxes">Boxes</option>
+        <option value="crates">Crates</option>
+      </select>
+      <input type="date" id="harvestDate" placeholder="Harvest Date" />
+      <input type="date" id="expiryDate" placeholder="Expiry Date" />
+      <div class="btn-group">
+        <button type="button" class="prev-btn">Back</button>
+        <button type="submit" id="submitButton">Submit</button>
+      </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader-container" id="loader" style="display: none;">
+    <span class="loader"></span>
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="/js/popup.js"></script>
+  <script src="/js/add.js"></script>
+  <script src="js/previewimage.js"></script>
+  <!-- Mobile Menu JavaScript -->
+  <script src="js/mobile-menu.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  
+  <!-- Dashboard Enhancement Script -->
+  <script>
+    // Dashboard Progress Indicator
+    function updateProgress() {
+      const activeStep = document.querySelector('.form-step.active');
+      const stepNumber = Array.from(document.querySelectorAll('.form-step')).indexOf(activeStep) + 1;
+      const progressFill = document.getElementById('progressFill');
+      const progressPercentage = (stepNumber / 5) * 100;
+      
+      if (progressFill) {
+        progressFill.style.width = progressPercentage + '%';
+      }
+      
+      // Update step indicators
+      document.querySelectorAll('.step').forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index + 1 < stepNumber) {
+          step.classList.add('completed');
+        } else if (index + 1 === stepNumber) {
+          step.classList.add('active');
+        }
+      });
+    }
+    
+    // Use MutationObserver to watch for changes in form steps
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initial progress update
+      updateProgress();
+      
+      // Watch for changes in the form steps
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (mutation.target.classList.contains('form-step')) {
+              updateProgress();
+            }
+          }
+        });
+      });
+      
+      // Observe all form steps for class changes
+      const formSteps = document.querySelectorAll('.form-step');
+      formSteps.forEach(step => {
+        observer.observe(step, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+      });
+      
+      // Also add direct event listeners to buttons as backup
+      const nextBtns = document.querySelectorAll('.next-btn');
+      const prevBtns = document.querySelectorAll('.prev-btn');
+      
+      nextBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          setTimeout(updateProgress, 200);
+        });
+      });
+      
+      prevBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          setTimeout(updateProgress, 200);
+        });
+      });
+    });
+    
+    // Animate stat cards on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const statCards = document.querySelectorAll('.stat-card');
+      statCards.forEach((card, index) => {
+        setTimeout(() => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          card.style.transition = 'all 0.6s ease';
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 100);
+        }, index * 150);
+      });
+    });
+
+    // Wait for popup system to be available
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ensure popup system is loaded
+      if (typeof window.Popup === 'undefined') {
+        console.warn('Popup system not loaded, falling back to basic alerts');
+      }
+    });
+    
+    // Override only the form submission, preserve step navigation
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for the original script to load
+      setTimeout(() => {
+        const form = document.getElementById('productForm');
+        if (form) {
+          // Store the original submit handler
+          const originalSubmitHandler = form.onsubmit;
+          
+          // Override only the submit event
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitButton');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            try {
+              // Get form data
+              const productData = {
+                name: document.getElementById('name').value.trim(),
+                price: Number(document.getElementById('price').value.trim()),
+                category: document.getElementById('category').value,
+                province: document.getElementById('province').value,
+                availability: document.getElementById('availability').value || 'Available',
+                location: document.getElementById('location').value,
+                organicStatus: document.getElementById('organicStatus').value || 'Non-Organic',
+                description: document.getElementById('description').value.trim(),
+                image: document.getElementById('image-view').style.backgroundImage ? 
+                       document.getElementById('image-view').style.backgroundImage.slice(5, -2) : null,
+                unit: document.getElementById('unit').value || 'kg',
+                harvestDate: document.getElementById('harvestDate').value || null,
+                expiryDate: document.getElementById('expiryDate').value || null,
+                isOnPromotion: document.getElementById('isOnPromotion').checked,
+                promoPrice: document.getElementById('isOnPromotion').checked ? 
+                           Number(document.getElementById('promoPrice').value) || null : null,
+                promotionEndDate: document.getElementById('isOnPromotion').checked ? 
+                                 (document.getElementById('promotionEndDate').value || null) : null
+              };
+              
+              // Check if image is uploaded
+              if (!productData.image) {
+                if (window.Popup) {
+                  window.Popup.error('Upload Required', 'Please upload a product image before submitting.');
+                } else {
+                  alert('Please upload a product image before submitting.');
+                }
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return;
+              }
+              
+              // Validate required fields
+              if (!productData.name || !productData.price || !productData.category || 
+                  !productData.province || !productData.location) {
+                if (window.Popup) {
+                  window.Popup.error('Missing Information', 'Please fill in all required fields.');
+                } else {
+                  alert('Please fill in all required fields.');
+                }
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return;
+              }
+              
+              // Submit to server
+              const isEdit = localStorage.getItem('editProductId');
+              const url = isEdit ? `/product/${isEdit}` : '/submit-product';
+              const method = isEdit ? 'PUT' : 'POST';
+              
+              const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
+              });
+              
+              const result = await response.text();
+              
+              if (response.ok) {
+                // Success
+                if (window.Popup) {
+                  window.Popup.success('Success!', 
+                    isEdit ? 'Product updated successfully!' : 'Product added successfully!', 
+                    {
+                      viewText: 'View Products',
+                      viewAction: () => window.location.href = '/view'
+                    });
+                } else {
+                  alert(isEdit ? 'Product updated successfully!' : 'Product added successfully!');
+                  window.location.href = '/view';
+                }
+                
+                // Clear edit mode if editing
+                if (isEdit) {
+                  localStorage.removeItem('editProductId');
+                }
+              } else {
+                // Error
+                if (window.Popup) {
+                  window.Popup.error('Error', result || 'Failed to submit product. Please try again.');
+                } else {
+                  alert(result || 'Failed to submit product. Please try again.');
+                }
+              }
+              
+            } catch (error) {
+              console.error('Error submitting product:', error);
+              if (window.Popup) {
+                window.Popup.error('Network Error', 'Failed to connect to server. Please check your connection and try again.');
+              } else {
+                alert('Failed to connect to server. Please check your connection and try again.');
+              }
+            } finally {
+              // Reset button
+              submitBtn.textContent = originalText;
+              submitBtn.disabled = false;
+            }
+          }, true); // Use capture phase to ensure our handler runs first
+        }
+      }, 200);
+    });
+  </script>
+</body>
+</html>

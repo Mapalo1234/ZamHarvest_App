@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="css/orderTable.css">
+   <link rel="stylesheet" href="all/css/font-awesome.min.css">
+     <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/loader.css">
+    <link rel="stylesheet" href="css/reviewSystem.css">
+    <link rel="stylesheet" href="css/receipt.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+  <title>Order Management</title>
+</head>
+<body>
+
+<div class="container">
+  <!-- Buyer Dashboard Header -->
+  <div class="buyer-dashboard-header">
+    <h1>Order Management Dashboard</h1>
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+          <h3 id="totalOrders">0</h3>
+          <p>Total Orders</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3 id="completedOrders">0</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa fa-clock-o"></i>
+        </div>
+        <div class="stat-content">
+          <h3 id="pendingOrders">0</h3>
+          <p>Pending</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa fa-dollar"></i>
+        </div>
+        <div class="stat-content">
+          <h3 id="totalSpent">K0</h3>
+          <p>Total Spent</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button class="action-btn refresh-btn" onclick="refreshOrders()">
+        <i class="fa fa-refresh"></i> Refresh
+      </button>
+      <button class="action-btn export-btn" onclick="exportOrders()">
+        <i class="fa fa-download"></i> Export
+      </button>
+      <button class="action-btn filter-btn" onclick="filterOrders()">
+        <i class="fa fa-filter"></i> Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- Order Status Filter -->
+  <div class="order-filters">
+    <div class="filter-group">
+      <label>Filter by Status:</label>
+      <select id="statusFilter" onchange="filterByStatus()">
+        <option value="all">All Orders</option>
+        <option value="pending">Pending</option>
+        <option value="accepted">Accepted</option>
+        <option value="paid">Paid</option>
+        <option value="delivered">Delivered</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Sort by:</label>
+      <select id="sortFilter" onchange="sortOrders()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="name">Product Name</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Review Section -->
+  <div id="reviewSection" class="review-section" style="display: none;">
+    <!-- Reviewable orders will be populated here -->
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr class="heading">
+          <th>Image</th>
+          <th>Product Name</th>
+          <th>Total Price</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Seller</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody class="orderInfo"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    <span class="showEntries"></span>
+    <div class="pagination"></div>
+  </footer>
+</div>
+
+
+<!-- Popup Form -->
+<div class="dark_bg">
+  <div class="popup">
+    <header>
+      <h2 class="modalTitle">Fill the Form</h2>
+      <button class="closeBtn">&times;</button>
+    </header>
+    <div class="body">
+      <form id="orderForm">
+        <div class="imgholder">
+          <img src="./image/icons8-empty-box-100.png" alt="Order Image" width="150" height="150" class="img">
+        </div>
+        <div class="inputFieldContainer">
+          <div class="form_control">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+          </div>
+          <div class="form_control">
+            <label for="totalPrice">Total Price:</label>
+            <input type="number" id="totalPrice" required>
+          </div>
+          <div class="form_control">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" required>
+          </div>
+          <div class="form_control">
+            <label for="seller">Seller:</label>
+            <input type="text" id="seller" required>
+          </div>
+          <div class="form_control">
+            <label for="paidStatus">Paid Status:</label>
+            <select id="paidStatus" required>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <footer class="popupFooter">
+      <button form="orderForm" class="submitBtn">Submit</button>
+      <button id="printReceiptFromDetailsBtn" class="print-receipt-btn" style="display: none;">
+        <i class="fa fa-print"></i> Print Receipt
+      </button>
+    </footer>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2>Complete Mobile Payment</h2>
+    <img src="/image/pay.png" alt=""></img>
+    <form id="paymentForm">
+      <input type="hidden" id="orderId" name="orderId">
+      
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" name="phone" required placeholder="Enter phone number">
+
+      <label for="amount">Amount:</label>
+      <input type="text" id="amount" name="amount" readonly>
+      <button type="submit">Pay Now</button>
+    </form>
+  </div>
+</div>
+        <div class="loader-wrapper">
+        <span class="loader"></span>
+      </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" class="review-modal" style="display: none;">
+    <div class="review-modal-content">
+      <div class="review-modal-header">
+        <h3>Write a Review</h3>
+        <span class="close-review-modal" onclick="reviewSystem.closeReviewForm()">&times;</span>
+      </div>
+      <form id="reviewForm" class="review-form">
+        <div class="form-group">
+          <label for="reviewRating">Overall Rating:</label>
+          <div class="star-rating">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star active" data-rating="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" value="5">
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewExperience">Experience Level:</label>
+          <select id="reviewExperience" required>
+            <option value="">Select your experience</option>
+            <option value="good">Good</option>
+            <option value="very-good">Very Good</option>
+            <option value="excellent">Excellent</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewComment">Your Review:</label>
+          <textarea id="reviewComment" placeholder="Tell others about your experience with this seller" maxlength="500" required></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" onclick="reviewSystem.closeReviewForm()">Cancel</button>
+          <button type="submit" class="submit-btn">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Receipt Modal -->
+  <div id="receiptModal" class="receipt-modal" style="display: none;">
+    <div class="receipt-modal-content">
+      <div class="receipt-modal-header">
+        <h3>Payment Receipt</h3>
+        <div class="receipt-actions">
+          <button id="printReceiptBtn" class="print-btn">
+            <i class="fa fa-print"></i> Print Receipt
+          </button>
+          <span class="close-receipt-modal" onclick="closeReceiptModal()">&times;</span>
+        </div>
+      </div>
+      <div id="receiptContent" class="receipt-content">
+        <!-- Receipt content will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.querySelector(".loader-wrapper");
+      if (loaderWrapper) {
+        loaderWrapper.style.display = "none"; // Hide loader
+      }
+    });
+  </script>
+<script src="js/receiptSystem.js"></script>
+<script src="js/orderTable.js"></script>
+<script src="js/reviewSystem.js"></script>
+<script src="js/autoRefreshSystem.js"></script>
+    <script src="js/app.js"></script>
+    <script src="/js/loginscript.js"></script>
+    <script src="/js/loader.js"></script>
+    <script src="js/notificationSystem.js"></script>
+    <script src="js/authManager.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

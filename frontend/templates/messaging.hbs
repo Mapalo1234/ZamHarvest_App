@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - ZamHarvest</title>
+    <link rel="stylesheet" href="css/messaging.css">
+    <link rel="stylesheet" href="all/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="whatsapp-container">
+        <!-- Left Panel - Chat List -->
+        <div class="chat-list-panel">
+            <!-- Top Bar -->
+            <div class="chat-list-header">
+                <div class="header-left">
+                    <h2>ZamHarvest chat</h2>
+                </div>
+                <div class="header-right">
+                <button id="closeMessagingBtn" class="close-btn" title="Close Messaging"><i class="fa fa-home" aria-hidden="true"></i></button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search or start a new chat" id="searchInput">
+                </div>
+            </div>
+
+            <!-- Conversations List -->
+            <div class="conversations-container">
+                <div id="conversationsList" class="conversations-list">
+                    <!-- Conversations will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Chat Area -->
+        <div class="chat-panel">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="chat-info">
+                        <h3 id="chatOtherPartyInfo">Select a conversation</h3>
+                        <p id="chatProductName">Choose a conversation to start messaging</p>
+                    </div>
+                </div>
+                <div class="chat-header-right">
+                    <button id="deleteConversationBtn" class="delete-conversation-btn" title="Delete Conversation" style="display: none;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>ZamHarvest</h3>
+                        <p>Send and receive messages between buyers and sellers.<br> linked supplier and customer via ZamHarvest platform.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Type a message" disabled>
+                </div>
+                <div class="send-actions">
+                    <button id="sendMessage" class="send-btn" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/authManager.js"></script>
+    <script src="js/messaging-dashboard.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

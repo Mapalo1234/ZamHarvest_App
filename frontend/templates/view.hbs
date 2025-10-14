@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/view.css">
+  <link rel="stylesheet" href="css/reviewSystem.css">
+  <link rel="stylesheet" href="all/css/font-awesome.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/search.css">
+</head>
+<body>
+    <header id="navbar">
+        <nav>
+          <a class="logo" href="/home">ZamHarvest</a>
+            <ul class="menu">
+              <li>
+                <a>Marketplace</a>
+                <ul class="submenu">
+                  <li><a href="/listproduct">Buyer</a></li>
+                  <li><a href="/view" >Seller</a></li>
+                </ul>
+              </li>
+              <li><a href="/messaging" >Messages</a></li>
+              <li><a href="#" >About</a></li>
+              <li><a href="#" >Resources</a></li>
+            </ul>
+          </nav>
+          <div class="login">
+             <i class="fa fa-user-circle-o" id="loginIcon" aria-hidden="true"></i>
+               <div class="login-dropdown" id="loginDropdown">
+                <!-- Content will be populated by JavaScript based on login status -->
+             </div>
+          </div>
+          <div class="notfication-logo">
+            <i class="fa fa-bell" aria-hidden="true"></i>
+            <span class="badge hidden">0</span>
+          </div>
+
+    </header>
+
+  <section class="top-banner">
+    <h2>Access to a Vast <span> Supplier</span> Network</h2>
+    <p>Get instant access to thousands of produce listings of all grades all in one place.</p>
+    
+  </section>
+
+  <div class="p-container">
+    <p>
+      Edit, add new availabilities. To create a new listing, click on "Add New Product" below. Have more questions? <br>
+      email us at ZamHarvest@gmail.com.
+    </p>
+  </div>
+
+  <div class="find-item">
+    <div class="search-container">
+      <form action="#" class="search" id="search-bar">
+        <input type="search" placeholder="Search Item..." name="q" class="search__input">
+        <div class="search__button" id="search-button">
+          <i class="ri-search-2-line search__icon"></i>
+          <i class="ri-close-line search__close"></i>
+        </div>
+      </form>
+    </div>
+    <a href="/add" class="button" onclick="localStorage.removeItem('editProductId')">
+      <i class="fa fa-plus" aria-hidden="true"></i> Add New Product
+    </a>
+  </div>
+
+  <!-- Seller Dashboard -->
+  <div class="seller-dashboard">
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Total Products</h3>
+        <span id="totalProducts">0</span>
+      </div>
+      <div class="stat-card">
+        <h3>Average Rating</h3>
+        <div class="rating-display">
+          <span id="averageRating">0.0</span>
+          <div class="stars" id="ratingStars"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3>Total Reviews</h3>
+        <span id="totalReviews">0</span>
+      </div>
+    </div>
+    
+    <div class="dashboard-actions">
+      <button class="action-btn" onclick="showReviews()">
+        <i class="fa fa-star"></i> View Reviews
+      </button>
+      <button class="action-btn" onclick="showRequests()">
+        <i class="fa fa-shopping-cart"></i> Requests
+      </button>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div id="reviewsSection" class="reviews-section" style="display: none;">
+    <div class="reviews-header">
+      <h3>Customer Reviews</h3>
+      <button class="close-reviews" onclick="hideReviews()">&times;</button>
+    </div>
+    <div id="sellerReviews" class="reviews-container">
+      <!-- Reviews will be loaded here -->
+    </div>
+  </div>
+
+  <h2 style="text-align:center">Your Listing</h2>
+  <div class="pro-container" id="productList"></div>
+
+  <div class="pagination-controls">
+    <button id="prevBtn"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></button>
+    <span id="pageIndicator"> 1</span>
+    <button id="nextBtn"><i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="bottom-button">
+    <a href="/add" class="button" onclick="localStorage.removeItem('editProductId')">
+      <i class="fa fa-plus" aria-hidden="true"></i> Add New Product
+    </a>
+  </div>
+  <!-- Review Modal -->
+  <div id="reviewModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Write a Review</h3>
+        <span class="close" onclick="reviewSystem.closeReviewForm()">&times;</span>
+      </div>
+      <form id="reviewForm" class="review-form">
+        <div class="form-group">
+          <label for="reviewRating">Rating *</label>
+          <div class="star-rating">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" name="rating" value="5" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewExperience">Experience *</label>
+          <select id="reviewExperience" name="experience" required>
+            <option value="">Select your experience</option>
+            <option value="poor">Poor</option>
+            <option value="average">Average</option>
+            <option value="good">Good</option>
+            <option value="very-good">Very Good</option>
+            <option value="excellent">Excellent</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="reviewComment">Comment *</label>
+          <textarea id="reviewComment" name="comment" rows="4" maxlength="500" placeholder="Share your experience with this product..." required></textarea>
+          <small class="char-count">0/500 characters</small>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="reviewSystem.closeReviewForm()">Cancel</button>
+          <button type="submit" class="btn-submit">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <span class="loader"></span>
+  <script src="js/search.js"></script>
+  <script src="/js/view.js"></script>
+  <script src="/js/reviewSystem.js"></script>
+  <script src="js/navigation.js"></script>
+  <script>
+</body>
+</html>
