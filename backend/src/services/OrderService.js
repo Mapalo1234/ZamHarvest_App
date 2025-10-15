@@ -21,13 +21,15 @@ class OrderService extends BaseService {
    * @returns {Object} Created order
    */
   async createOrder(orderData, userId, userName) {
+
     try {
       this.log('createOrder', { userId, productId: orderData.productId });
+      this.validateRequired(orderData, ['productId', 'quantity', 'deliveryDate', 'totalPrice', 'productName', "referenceNo"]);
 
-      const { productId, quantity, deliveryDate, totalPrice, productName, productImage, unit } = orderData;
-
+      const { productId, quantity, deliveryDate, totalPrice, productName, productImage, unit, referenceNo } = orderData;
+   
       // Validate required fields
-      this.validateRequired(orderData, ['productId', 'quantity', 'deliveryDate', 'totalPrice', 'productName']);
+      this.validateRequired(orderData, ['productId', 'quantity', 'deliveryDate', 'totalPrice', 'productName', "referenceNo"]);
 
       // Validate productId
       if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -87,6 +89,7 @@ class OrderService extends BaseService {
         unit: unit || product.unit,
         username: userName,
         sellerId,
+        referenceNo,
         sellerName,
         paidStatus: "Pending"
       });

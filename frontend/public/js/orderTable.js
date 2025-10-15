@@ -692,13 +692,12 @@ document.getElementById("paymentForm").addEventListener("submit", async (e) => {
     }
     
     // Use the order's ID as reference for the payment
-    const reference = orderId;
 
     try {
         const response = await fetch("/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount, phone, reference, orderId })
+            body: JSON.stringify({ amount, phone, orderId })
         });
 
         const result = await response.json();

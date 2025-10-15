@@ -299,12 +299,18 @@ document.querySelector(".order").addEventListener("click", async (e) => {
   let userId = user ? (user._id || user.id) : null;
   let userName = user ? user.username : null;
     const productId = localStorage.getItem('selectedProductId');
+    const referenceNo = 'REF' + Math.floor(100000 + Math.random() * 900000); 
+    console.log("referenceNo",referenceNo)
   
 
   const quantity = parseInt(document.querySelector(".num").textContent);
   const deliveryDate = document.querySelector('input[type="date"]').value;
   console.log("seller_Id",seller_Id)
   if (!deliveryDate) return alert("Please select a delivery date");
+
+      if (referenceNo.length === 0) {
+      return alert("Reference number is required");
+    }
 
   try {
     const response = await fetch("/create-order", {
@@ -321,6 +327,7 @@ document.querySelector(".order").addEventListener("click", async (e) => {
         productImage,
         sellerName: productSeller,
         userId,
+        referenceNo,
         userName,
         sellerId: seller_Id
       })

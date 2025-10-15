@@ -722,6 +722,7 @@ nav .logo {
     color: #30653e;
     margin-bottom: 10px;
     font-size: 24px;
+    text-align: center;
   }
   
   .welcome-logged-in p, .welcome-guest p {

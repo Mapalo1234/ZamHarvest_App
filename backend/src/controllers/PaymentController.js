@@ -1,5 +1,6 @@
 const PaymentService = require("../services/PaymentService");
 const BaseController = require("./BaseController");
+const Order = require("../models/order");
 
 /**
  * Payment Controller
@@ -13,30 +14,40 @@ class PaymentController extends BaseController {
   /**
    * Process payment
    */
-  processPayment = this.asyncHandler(async (req, res) => {
-    const { amount, phone, reference, orderId } = req.body;
-    
-    console.log("Incoming payment request:", req.body);
+  
+processPayment = this.asyncHandler(async (req, res) => {
+  const { amount, phone, orderId } = req.body;
 
-    // Validate required fields
-    if (!amount || !phone || !reference) {
-      return this.sendError(res, "Missing required fields", 400);
-    }
+  console.log("Incoming payment request:", req.body);
 
-    const payload = {
+  // Fetch the order using orderId
+  const order = await Order.findById(orderId);
+  if (!order) {
+    return this.sendError(res, "Order not found", 404);
+  }
+
+  const referenceNo = order.referenceNo; // or order.reference_no, depending on your schema
+  console.log("Using reference number:", referenceNo);
+  // Validate required fields
+  if (!amount || !phone || !referenceNo) {
+    return this.sendError(res, "Missing required fields", 400);
+  }
+
+  const payload = {
     auth: {
       api_id: "47a68b45-3dec-4616-9586-fab119a16030",
       merchant_id: "MEC01011",
       api_key: "d62f223f-b867-4412-8413-c288d62da930",
-      channel: "API" 
+      channel: "API"
     },
     data: {
       method: "runBillPayment",
       receiver_id: phone,
-      reference_no: reference,
+      reference_no: referenceNo,
       amount: amount
     }
   };
+
   try {
     const response = await fetch("https://sandbox.zynlepay.com/zynlepay/jsonapi", {
       method: "POST",
@@ -69,51 +80,55 @@ class PaymentController extends BaseController {
   /**
    * Handle payment callback from payment gateway
    */
- paymentCallback = this.asyncHandler(async (req, res) => {
+paymentCallback = this.asyncHandler(async (req, res) => {
   try {
-    const { response_description, reference_no } = req.body;
-
+    // Log the raw callback for debugging
     console.log("Payment callback received:", req.body);
 
-    // Default payment status
-    let paidStatus = "Pending";
+    // Extract values from callback
+    const { response_description, reference_no } = req.body;
 
-    if (response_description === 'SUCCESSFUL') {
-      paidStatus = "paid";
-    } else {
-      paidStatus = "failed";
+    if (!reference_no) {
+      return res.status(400).json({ message: "Missing reference_no in callback" });
     }
 
-    // Update the order's payment status in the database
+    // Determine paid status based on callback description
+    let paidStatus;
+    if (response_description && response_description.toUpperCase() === "SUCCESSFUL") {
+      paidStatus = "Paid";
+    } else {
+      paidStatus = "Failed";
+    }
+
+    // Find and update the matching order by reference number
     const updatedOrder = await Order.findOneAndUpdate(
-      { orderId: reference_no },
-      { paidStatus },
-      { new: true }
-    ).populate("sellerId buyerId", "username email"); // get seller & buyer info
+      { referenceNo: reference_no },        // Match reference number in your DB
+      { paidStatus },                       // Update payment status
+      { new: true }                         // Return the updated document
+    ).populate("sellerId buyerId", "username email");
 
     if (!updatedOrder) {
-      return res.status(404).json({ error: "Order not found" });
+      console.warn("No order found with reference number:", reference_no);
+      return res.status(404).json({ message: "Order not found for given reference number" });
     }
 
-    if (paidStatus === "paid") {
-      // Optionally call your service layer if needed
-      await OrderService.updatePaidStatus(reference_no, "paid");
-
-      return res.status(200).json({
-        message: "Order marked as paid.",
-        order: updatedOrder
-      });
-    } else {
-      return res.status(400).json({
-        message: "Payment not successful.",
-        order: updatedOrder
-      });
+    // Optionally trigger your internal service to update other systems
+    if (paidStatus === "paid" && OrderService.updatePaidStatus) {
+      await OrderService.updatePaidStatus(reference_no, paidStatus);
     }
+
+    // Respond to the payment gateway immediately
+    return res.status(200).json({
+      message: `Order payment status updated to '${paidStatus}'`,
+      order: updatedOrder,
+    });
+
   } catch (error) {
-    console.error("Error handling callback:", error.message);
-    res.status(500).json({ message: "Callback received but internal error" });
+    console.error("Error handling payment callback:", error);
+    return res.status(500).json({ message: "Internal server error processing callback" });
   }
 });
+
 
 
   /**

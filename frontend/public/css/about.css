@@ -68,6 +68,17 @@ body {
 .card-p {
   font-size: 18px;
   margin-bottom: 20px;
+  word-wrap: break-word;
+}
+@media  screen and (width<= 720px) {
+  .card-p {
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+  word-wrap: break-word;
+}
+
+  
 }
 
 /* Buttons container for spacing */
@@ -168,7 +179,7 @@ body {
 /* Tablets and smaller */
 @media screen and (max-width: 992px) {
   .about-container {
-    flex-direction: column;
+    flex-direction: row;
     padding-top: 60px;
   }
 

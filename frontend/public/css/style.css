@@ -351,27 +351,26 @@ a{
 
   /* response to small screen */
   @media (max-width: 768px) {
-    .hero-section {
-      flex-direction: column;
-      text-align: center;
-    }
 
     body {
       width: 100%;
       
     }
-  
-    .hero-content {
-      max-width: 100%;
-      margin-bottom: 20px;
+
+    .carousel .item .content .des {
+    font-size: 15px;
+    width: 270px;
+    }
+
+    .carousel .item .content .topic {
+        margin-top: 20px;
+        font-size: 40px;
+    }
+
+    .carousel .item {
+        width: 150px;
+        height: 170px;
     }
   
-    .hero-image {
-      margin-left: 0;
-    }
-  
-    .hero-image img {
-      height: 250px;
-    }
   }
   
