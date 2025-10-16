@@ -3,6 +3,7 @@ class ReviewSystem {
     this.currentOrderId = null;
     this.currentSellerId = null;
     this.currentProductId = null;
+    this.ordersData = [];
   }
 
   // Initialize review system
@@ -29,7 +30,9 @@ class ReviewSystem {
   // Load orders that can be reviewed
   async loadReviewableOrders() {
     try {
-      const response = await fetch('/api/reviewable-orders');
+      const response = await fetch('/api/reviewable-orders', {
+        credentials: 'include'
+      });
       const data = await response.json();
       
       if (data.orders && data.orders.length > 0) {
@@ -47,22 +50,32 @@ class ReviewSystem {
     const reviewSection = document.getElementById('reviewSection');
     if (!reviewSection) return;
 
-    const ordersHtml = orders.map(order => `
-      <div class="reviewable-order" data-order-id="${order._id}">
-        <div class="order-info">
-          <img src="${order.productId.image}" alt="${order.productId.name}" class="product-image">
-          <div class="order-details">
-            <h4>${order.productId.name}</h4>
-            <p>Seller: ${order.sellerId.username}</p>
-            <p>Delivered: ${new Date(order.deliveredAt).toLocaleDateString()}</p>
-            <p>Quantity: ${order.quantity} ${order.unit}</p>
+    // Store orders data for reference
+    this.ordersData = orders;
+
+    console.log('Displaying reviewable orders:', orders);
+    if (orders.length > 0) {
+      console.log('First order structure:', orders[0]);
+    }
+
+    const ordersHtml = orders.map((order, index) => {
+      return `
+        <div class="reviewable-order" data-order-id="${order._id}">
+          <div class="order-info">
+            <img src="${order.productId.image}" alt="${order.productId.name}" class="product-image">
+            <div class="order-details">
+              <h4>${order.productId.name}</h4>
+              <p>Seller: ${order.sellerId.username}</p>
+              <p>Delivered: ${new Date(order.deliveredAt).toLocaleDateString()}</p>
+              <p>Quantity: ${order.quantity} ${order.unit}</p>
+            </div>
           </div>
+          <button class="review-btn" onclick="reviewSystem.openReviewFormByIndex(${index})">
+            Write Review
+          </button>
         </div>
-        <button class="review-btn" onclick="reviewSystem.openReviewForm('${order._id}', '${order.sellerId._id}', '${order.productId._id}')">
-          Write Review
-        </button>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     reviewSection.innerHTML = `
       <h3>Orders Ready for Review</h3>
@@ -72,12 +85,75 @@ class ReviewSystem {
     `;
   }
 
-  // Open review form
-  openReviewForm(orderId, sellerId, productId) {
+  // Open review form by index (new method)
+  openReviewFormByIndex(orderIndex) {
+    console.log('Opening review form for order index:', orderIndex);
+    
+    if (!this.ordersData || !this.ordersData[orderIndex]) {
+      console.error('Order data not found for index:', orderIndex);
+      alert('Error: Order data not found. Please refresh the page and try again.');
+      return;
+    }
+    
+    const order = this.ordersData[orderIndex];
+    console.log('Selected order:', order);
+    
+    // Extract IDs directly from the order object
+    const orderId = order._id;
+    const sellerId = order.sellerId._id || order.sellerId;
+    const productId = order.productId._id || order.productId;
+    
+    console.log('Extracted IDs:', { orderId, sellerId, productId });
+    
+    // Validate IDs
+    if (!orderId || !sellerId || !productId) {
+      console.error('Missing required IDs:', { orderId, sellerId, productId });
+      alert('Error: Missing order data. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Set current review data
     this.currentOrderId = orderId;
-    this.currentSellerId = sellerId;
-    this.currentProductId = productId;
+    this.currentSellerId = sellerId.toString();
+    this.currentProductId = productId.toString();
+    
+    console.log('Review form data set:', {
+      currentOrderId: this.currentOrderId,
+      currentSellerId: this.currentSellerId,
+      currentProductId: this.currentProductId
+    });
 
+    // Show modal
+    const modal = document.getElementById('reviewModal');
+    if (modal) {
+      modal.style.display = 'block';
+      this.resetReviewForm();
+    }
+  }
+
+  // Open review form (legacy method for compatibility with orderTable.js)
+  openReviewForm(orderId, sellerId, productId) {
+    console.log('Opening review form with IDs:', { orderId, sellerId, productId });
+    
+    // Validate IDs
+    if (!orderId || !sellerId || !productId) {
+      console.error('Missing required IDs:', { orderId, sellerId, productId });
+      alert('Error: Missing order data. Please refresh the page and try again.');
+      return;
+    }
+    
+    // Set current review data
+    this.currentOrderId = orderId;
+    this.currentSellerId = sellerId.toString();
+    this.currentProductId = productId.toString();
+    
+    console.log('Review form data set:', {
+      currentOrderId: this.currentOrderId,
+      currentSellerId: this.currentSellerId,
+      currentProductId: this.currentProductId
+    });
+
+    // Show modal
     const modal = document.getElementById('reviewModal');
     if (modal) {
       modal.style.display = 'block';
@@ -99,7 +175,6 @@ class ReviewSystem {
     document.getElementById('reviewRating').value = '5';
     document.getElementById('reviewExperience').value = '';
     this.updateStarDisplay(5);
-    console.log('Form reset - rating set to 5, experience cleared');
   }
 
   // Update star display
@@ -122,7 +197,6 @@ class ReviewSystem {
         const rating = parseInt(e.target.dataset.rating);
         document.getElementById('reviewRating').value = rating;
         this.updateStarDisplay(rating);
-        console.log('Star clicked, rating set to:', rating);
       }
     });
 
@@ -180,15 +254,7 @@ class ReviewSystem {
     const rating = parseInt(document.getElementById('reviewRating').value);
     const experience = document.getElementById('reviewExperience').value;
 
-    console.log('Form validation debug:', {
-      comment: comment,
-      rating: rating,
-      experience: experience,
-      commentLength: comment.length,
-      ratingValid: !isNaN(rating) && rating >= 1 && rating <= 5,
-      experienceValid: experience && experience !== ''
-    });
-
+    // Validate form data
     if (!comment || !experience || isNaN(rating) || rating < 1 || rating > 5) {
       alert('Please fill in all fields correctly');
       return;
@@ -199,71 +265,48 @@ class ReviewSystem {
       return;
     }
 
-    // Debug logging for review context
-    console.log('Review submission context:', {
-      currentOrderId: this.currentOrderId,
-      currentProductId: this.currentProductId,
-      currentSellerId: this.currentSellerId
-    });
+    // Validate that we have the required IDs
+    if (!this.currentOrderId || !this.currentSellerId || !this.currentProductId) {
+      alert('Error: Missing order data. Please refresh the page and try again.');
+      console.error('Missing IDs:', {
+        orderId: this.currentOrderId,
+        sellerId: this.currentSellerId,
+        productId: this.currentProductId
+      });
+      return;
+    }
+
+    // Get buyer ID
+    let buyerId = this.getBuyerId();
+    if (!buyerId) {
+      buyerId = await this.getBuyerIdFromSession();
+    }
+    
+    if (!buyerId) {
+      alert('Please log in to submit a review');
+      return;
+    }
 
     try {
-      // Determine if this is an order review or product review
-      // Priority: If we have an orderId, it's an order review (even if productId is also set)
-      // If we only have productId, it's a product review
-      const isOrderReview = !!this.currentOrderId;
-      const isProductReview = !this.currentOrderId && !!this.currentProductId;
-
-      // Get buyer ID from session or localStorage
-      let buyerId = this.getBuyerId();
-      
-      // If not found in localStorage, try to get from session API
-      if (!buyerId) {
-        console.log('Buyer ID not found in localStorage, trying session API...');
-        buyerId = await this.getBuyerIdFromSession();
-      }
-      
-      if (!buyerId) {
-        alert('Please log in to submit a review');
-        console.error('No buyer ID found in localStorage or session');
-        return;
-      }
-
-      let requestBody = {
+      // Prepare request body
+      const requestBody = {
+        orderId: this.currentOrderId,
+        productId: this.currentProductId,
+        sellerId: this.currentSellerId,
         rating,
         comment,
         experience,
         buyerId
       };
 
-      if (isOrderReview) {
-        requestBody.orderId = this.currentOrderId;
-        // Also include productId and sellerId for order reviews
-        if (this.currentProductId) {
-          requestBody.productId = this.currentProductId;
-        }
-        if (this.currentSellerId) {
-          requestBody.sellerId = this.currentSellerId;
-        }
-      } else if (isProductReview) {
-        // For product reviews, we need to find an order for this product
-        // This is a simplified approach - in reality you'd need to check if user has a delivered order
-        requestBody.productId = this.currentProductId;
-        requestBody.sellerId = this.currentSellerId;
-      } else {
-        alert('Unable to determine review type. Please ensure you are reviewing from a valid page.');
-        console.error('Review context:', {
-          currentOrderId: this.currentOrderId,
-          currentProductId: this.currentProductId,
-          currentSellerId: this.currentSellerId
-        });
-        return;
-      }
+      console.log('Submitting review with data:', requestBody);
 
       const response = await fetch('/api/submit-review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(requestBody)
       });
 
@@ -272,20 +315,10 @@ class ReviewSystem {
       if (response.ok) {
         alert('Review submitted successfully!');
         this.closeReviewForm();
-        
-        // Refresh appropriate content based on review type
-        if (isOrderReview) {
-          this.loadReviewableOrders(); // Refresh the list
-        }
-        if (isProductReview) {
-          // Refresh product reviews if on product detail page
-          if (typeof loadProductReviews === 'function') {
-            loadProductReviews(this.currentProductId);
-          }
-        }
-        this.loadSellerReviews(); // Refresh seller reviews if on seller page
+        this.loadReviewableOrders(); // Refresh the list
       } else {
         alert(data.error || 'Failed to submit review');
+        console.error('Review submission failed:', data);
       }
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -298,7 +331,9 @@ class ReviewSystem {
     if (!sellerId) return;
 
     try {
-      const response = await fetch(`/api/reviews/seller/${sellerId}`);
+      const response = await fetch(`/api/reviews/seller/${sellerId}`, {
+        credentials: 'include'
+      });
       
       if (response.ok) {
         const data = await response.json();
@@ -382,7 +417,6 @@ class ReviewSystem {
         if (userData) {
           const user = JSON.parse(userData);
           buyerId = user.id || user._id;
-          console.log('Found user ID from localStorage user object:', buyerId);
         }
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
@@ -399,7 +433,6 @@ class ReviewSystem {
       buyerId = window.authManager.user.id || window.authManager.user._id;
     }
     
-    console.log('getBuyerId result:', buyerId);
     return buyerId;
   }
 
@@ -413,7 +446,6 @@ class ReviewSystem {
       
       if (response.ok) {
         const sessionData = await response.json();
-        console.log('Session data from API:', sessionData);
         return sessionData.data?.user?.id || sessionData.user?.id;
       }
     } catch (error) {

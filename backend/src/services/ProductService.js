@@ -226,9 +226,50 @@ class ProductService extends BaseService {
         throw new AppError("Unauthorized: You can only delete your own products", 403);
       }
 
-      // Soft delete by setting isActive to false
-      product.isActive = false;
-      await product.save();
+      // Check for related records that might prevent deletion
+      const Order = require("../models/order");
+      const Review = require("../models/Review");
+      const Message = require("../models/Message");
+      
+      // Check for active orders
+      const activeOrders = await Order.find({ 
+        productId: productId,
+        deliveryStatus: { $nin: ['Delivered', 'Cancelled'] }
+      });
+      
+      if (activeOrders.length > 0) {
+        throw new AppError(`Cannot delete product: There are ${activeOrders.length} active orders for this product. Please complete or cancel these orders first.`, 400);
+      }
+
+      // Check for pending orders
+      const pendingOrders = await Order.find({ 
+        productId: productId,
+        paidStatus: 'Pending'
+      });
+      
+      if (pendingOrders.length > 0) {
+        throw new AppError(`Cannot delete product: There are ${pendingOrders.length} pending orders for this product. Please complete or cancel these orders first.`, 400);
+      }
+
+      // Delete related records first (cascade delete)
+      // Delete reviews for this product
+      await Review.deleteMany({ productId: productId });
+      this.log('Deleted reviews for product', { productId, deletedCount: 'multiple' });
+
+      // Delete messages for this product
+      await Message.deleteMany({ productId: productId });
+      this.log('Deleted messages for product', { productId, deletedCount: 'multiple' });
+
+      // Delete completed/delivered orders for this product (keep for historical records)
+      // Note: We'll keep delivered orders for historical purposes, but delete pending ones
+      await Order.deleteMany({ 
+        productId: productId,
+        deliveryStatus: { $in: ['Delivered', 'Cancelled'] }
+      });
+      this.log('Deleted historical orders for product', { productId, deletedCount: 'multiple' });
+
+      // Now delete the product
+      await Product.findByIdAndDelete(productId);
 
       this.log('deleteProduct completed', { productId });
       return { success: true, message: "Product deleted successfully" };

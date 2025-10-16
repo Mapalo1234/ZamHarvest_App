@@ -275,6 +275,7 @@ async function loadSellerReviews() {
     console.error('Error loading seller reviews:', error);
   }
 }
+             
 
 function displaySellerReviews(reviews) {
   const reviewsContainer = document.getElementById('sellerReviews');

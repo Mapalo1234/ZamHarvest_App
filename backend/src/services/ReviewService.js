@@ -70,6 +70,10 @@ class ReviewService extends BaseService {
       throw new Error("Order not found");
     }
 
+    if (!order.productId || !order.sellerId) {
+       throw new Error("Order is missing product or seller information");
+    }
+
     // Check if buyer owns this order
     if (order.buyerId.toString() !== buyerId) {
       return {
@@ -100,17 +104,17 @@ class ReviewService extends BaseService {
     }
 
     // Create review
-    const review = new Review({
-      buyerId,
-      sellerId: order.sellerId._id,
-      orderId,
-      productId: order.productId._id,
-      rating,
-      comment,
-      experience,
-      title: title || '',
-      isVerified: true
-    });
+const review = new Review({
+  buyerId,
+  sellerId: order.sellerId._id,
+  orderId,
+  productId: order.productId._id,
+  rating,
+  comment,
+  experience,
+  title: title || '',
+  isVerified: true
+});
 
     await review.save();
 
